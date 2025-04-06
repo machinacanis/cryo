@@ -57,7 +57,7 @@ func (f *DefaultDarkFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	logMsg := fmt.Sprintf(
 		"%s• %s [%s%s%s] %s%s%s\n",
 		gray,
-		entry.Time.Format("2006-01-02 15:04:05"),
+		entry.Time.Format("01-02 15:04:05"),
 		levelColor,
 		levelText,
 		gray,
@@ -125,7 +125,7 @@ func (f *DefaultLightFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	logMsg := fmt.Sprintf(
 		"%s• %s [%s%s%s] %s%s%s\n",
 		gray,
-		entry.Time.Format("2006-01-02 15:04:05"),
+		entry.Time.Format("01-02 15:04:05"),
 		levelColor,
 		levelText,
 		gray,

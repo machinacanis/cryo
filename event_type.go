@@ -85,3 +85,32 @@ func (et EventType) ToString() string {
 		return "UnknownEventType"
 	}
 }
+
+// AllEventTypes 返回所有可用的事件类型
+func AllEventTypes() []EventType {
+	return []EventType{
+		UniEventType,
+		UniMessageEventType,
+		PrivateMessageEventType,
+		GroupMessageEventType,
+		TempMessageEventType,
+		NewFriendRequestEventType,
+		NewFriendEventType,
+		FriendRecallEventType,
+		FriendRenameEventType,
+		FriendPokeEventType,
+		GroupMemberPermissionUpdatedEventType,
+		GroupNameUpdatedEventType,
+		GroupMuteEventType,
+		GroupRecallEventType,
+		GroupMemberJoinRequestEventType,
+		GroupMemberIncreaseEventType,
+		GroupMemberDecreaseEventType,
+		GroupDigestEventType,
+		GroupReactionEventType,
+		GroupMemberSpecialTitleUpdatedEventType,
+		GroupInviteEventType,
+		BotConnectedEventType,
+		BotDisconnectedEventType,
+	}
+}

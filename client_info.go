@@ -11,7 +11,7 @@ type ClientInfo struct {
 	Version   string `json:"version"`
 	DeviceNum int    `json:"device_num"`
 	Signature string `json:"signature"`
-	Uin       int    `json:"uin"`
+	Uin       uint32 `json:"uin"`
 	Uid       string `json:"uid"`
 }
 
@@ -40,7 +40,7 @@ func WriteClientInfos(clientInfos []ClientInfo) error {
 	if err != nil {
 		return err
 	}
-
+	
 	return nil
 }
 

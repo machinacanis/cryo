@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/LagrangeDev/LagrangeGo/client"
 	"github.com/LagrangeDev/LagrangeGo/client/auth"
-	"github.com/machinacanis/cryobot/log"
+	"github.com/machinacanis/cryo/log"
 	"os"
 	"time"
 )
@@ -17,12 +17,13 @@ type LagrangeClient struct {
 	Platform  string
 	Version   string
 	DeviceNum int
-	Uin       int
+	Uin       uint32
 	Uid       string
 	Nickname  string
 
 	initFlag bool   // 是否初始化完成
 	conf     Config // 配置项
+	bus      *EventBus
 }
 
 // NewLagrangeClient 创建一个新的LagrangeClient实例
@@ -31,9 +32,10 @@ func NewLagrangeClient() *LagrangeClient {
 }
 
 // Init 初始化一个新的LagrangeClient客户端
-func (c *LagrangeClient) Init(conf Config) {
+func (c *LagrangeClient) Init(bus *EventBus, conf Config) {
 	c.Id = newUUID() // 给Bot客户端分配一个唯一的UUID
 	c.conf = conf
+	c.bus = bus
 
 	// 默认平台和版本
 	if c.Platform == "" {
@@ -121,7 +123,7 @@ func (c *LagrangeClient) UseSignature(sig string) {
 
 func (c *LagrangeClient) AfterLogin() {
 	// 登录成功后，保存签名
-	c.Uin = int(c.Client.Sig().Uin)
+	c.Uin = c.Client.Sig().Uin
 	c.Uid = c.Client.Sig().UID
 	//SendBotConnectedEvent(c)       // 发送登录成功事件
 	if c.conf.EnableClientAutoSave { // 如果启用了自动保存
@@ -132,7 +134,7 @@ func (c *LagrangeClient) AfterLogin() {
 	}
 
 	// 订阅事件
-	//EventBind(c)
+	EventBind(c)
 }
 
 // GetQRCode 获取二维码信息
@@ -188,6 +190,7 @@ func (c *LagrangeClient) QRCodeLogin() bool {
 	c.PrintQRCode(url)
 	if !c.watingForLoginResult() { // 等待扫码登录
 		log.Warn("扫码登录失败！")
+		return false
 	}
 	c.AfterLogin()
 	return true
@@ -218,4 +221,71 @@ func (c *LagrangeClient) watingForLoginResult() bool {
 		return false
 	}
 	return true
+}
+
+// SendPrivateMessage 发送私聊消息
+func (c *LagrangeClient) SendPrivateMessage(userUin uint32, msg *Message) (ok bool, messageId uint32) {
+	// 发送私聊消息
+	message, err := c.Client.SendPrivateMessage(userUin, msg.ToIMessageElements())
+	if err != nil {
+		log.Errorf("向用户 %d 发送消息时出现错误：%v", userUin, err)
+		return false, 0
+	}
+	return true, message.ID
+}
+
+// SendGroupMessage 发送群消息
+func (c *LagrangeClient) SendGroupMessage(groupUin uint32, msg *Message) (ok bool, messageId uint32) {
+	// 发送群消息
+	message, err := c.Client.SendGroupMessage(groupUin, msg.ToIMessageElements())
+	if err != nil {
+		log.Errorf("向群 %d 发送消息时出现错误：%v", groupUin, err)
+		return false, 0
+	}
+	return true, message.ID
+}
+
+// SendTempMessage 发送临时消息
+func (c *LagrangeClient) SendTempMessage(groupUin, userUin uint32, msg *Message) (ok bool, messageId uint32) {
+	// 发送临时消息
+	message, err := c.Client.SendTempMessage(groupUin, userUin, msg.ToIMessageElements())
+	if err != nil {
+		log.Errorf("向与用户 %d 的临时会话发送消息时出现错误：%v", groupUin, err)
+		return false, 0
+	}
+	return true, message.ID
+}
+
+func (c *LagrangeClient) Send(event MessageEvent, args ...interface{}) (ok bool, messageId uint32) {
+	// 处理消息内容
+	m := ProcessMessageContent(args...)
+	// 根据传入的事件来发送消息
+	switch event.GetEventType() {
+	case PrivateMessageEventType:
+		return c.SendPrivateMessage(event.GetUniMessageEvent().SenderUin, m)
+	case GroupMessageEventType:
+		return c.SendPrivateMessage(event.GetUniMessageEvent().SenderUin, m)
+	case TempMessageEventType:
+		return c.SendPrivateMessage(event.GetUniMessageEvent().SenderUin, m)
+	case UniMessageEventType:
+		me := event.GetUniMessageEvent()
+		// 通过tag来判断消息类型
+		if Contains(me.EventTags, "private_message") {
+			return c.SendPrivateMessage(me.SenderUin, m)
+		} else if Contains(me.EventTags, "group_message") {
+			return c.SendGroupMessage(me.GroupUin, m)
+		} else if Contains(me.EventTags, "temp_message") {
+			return c.SendTempMessage(me.GroupUin, me.SenderUin, m)
+		}
+	default:
+		log.Error("发送消息时传入了不支持的消息事件")
+	}
+	return false, 0
+}
+
+func (c *LagrangeClient) Reply(event MessageEvent, args ...interface{}) (ok bool, messageId uint32) {
+	// 处理消息内容
+	m := Message{}
+	m.AddReply(event).Add(*ProcessMessageContent(args...)...)
+	return c.Send(event, m)
 }

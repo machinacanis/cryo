@@ -2,7 +2,7 @@ package cryo
 
 import (
 	lgrmessage "github.com/LagrangeDev/LagrangeGo/message"
-	"github.com/machinacanis/cryobot/log"
+	"github.com/machinacanis/cryo/log"
 	"io"
 )
 

@@ -7,6 +7,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/skip2/go-qrcode"
 	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -21,7 +22,8 @@ func newUUID() string {
 }
 
 func newNickname() string {
-	return fmt.Sprintf("Bot%d", botClientCount)
+	botClientCount++
+	return fmt.Sprintf("Bot%d", botClientCount-1)
 }
 
 // getQRCodeString 生成二维码字符串
@@ -116,4 +118,44 @@ func ToJsonString(e any) string {
 		return ""
 	}
 	return string(res)
+}
+
+// ProcessMessageContent 处理消息内容
+func ProcessMessageContent(args ...interface{}) *Message {
+	result := Message{} // 创建一个新的消息对象
+	for _, arg := range args {
+		// 遍历参数并根据其类型进行处理
+		switch v := arg.(type) {
+		case string:
+			// 如果参数是字符串，则将其添加到消息元素中
+			result.AddText(v)
+		case int:
+			result.AddText(strconv.Itoa(v))
+		case int8:
+			result.AddText(strconv.FormatInt(int64(v), 10))
+		case int16:
+			result.AddText(strconv.FormatInt(int64(v), 10))
+		case int32:
+			result.AddText(strconv.FormatInt(int64(v), 10))
+		case int64:
+			result.AddText(strconv.FormatInt(v, 10))
+		case uint32:
+			result.AddText(strconv.FormatUint(uint64(v), 10))
+		case uint64:
+			result.AddText(strconv.FormatUint(v, 10))
+		case Message:
+			// 如果参数是CryoMessage，则将其添加到消息元素中
+			result.Add(v...)
+		}
+	}
+	return &result
+}
+
+func Contains[T string | uint32 | int | EventType](slice []T, item T) bool {
+	for _, v := range slice {
+		if v == item {
+			return true
+		}
+	}
+	return false
 }
