@@ -32,7 +32,8 @@ go get github.com/machinacanis/cryo
 package main
 
 import (
-	cryo "github.com/machinacanis/cryo"
+	"github.com/machinacanis/cryo"
+	"github.com/machinacanis/cryo/log"
 	"github.com/sirupsen/logrus"
 )
 
@@ -44,17 +45,21 @@ func main() {
 		EnableEventDebugMiddleware:   true,
 	})
 
-	bot.OnType(cryo.PrivateMessageEventType).
-		Handle(func(e cryo.PrivateMessageEvent) {
-			cryo.Info("接收到了" + e.SenderNickname + "的私聊消息！")
+	cryo.NewOnResponser(bot.GetBus(), cryo.PrivateMessageEventType, cryo.GroupMessageEventType).
+		Handle(func(e *cryo.PrivateMessageEvent) *cryo.PrivateMessageEvent {
+			log.Info("这是一条私聊消息！")
+			return e
 		}).
-		Handle(func(e cryo.GroupMessageEvent) {
-			cryo.Info("接收到了" + e.GroupName + "的群消息！")
+		Handle(func(e *cryo.GroupMessageEvent) *cryo.GroupMessageEvent {
+			log.Info("这是一条群消息！")
+			return e
 		}).
 		Register()
+
 	bot.AutoConnect()
 	bot.Start()
 }
+
 ```
 
 ## 开发进度

@@ -18,6 +18,7 @@ type Middleware interface {
 	AddHandler(handlers ...EventHandler[Event])       // 添加事件处理器
 	Do(event Event) bool                              // 执行中间件
 	DoAsync(event Event)                              // 并发执行中间件，会破坏中间件的顺序性，谨慎使用
+	GetHandlerCount() int                             // 获取事件处理器的数量
 }
 
 // UniMiddleware 是一个中间件的实现，包含了事件处理器和中间件的基本信息
@@ -26,6 +27,11 @@ type UniMiddleware struct {
 	id            string                // 中间件ID
 	tag           []string              // 中间件标签
 	Handlers      []EventHandler[Event] // 事件处理器列表
+}
+
+// GetHandlerCount 获取事件处理器的数量
+func (m *UniMiddleware) GetHandlerCount() int {
+	return len(m.Handlers)
 }
 
 // IsGlobal 判断这个中间件是否是全局中间件
@@ -118,7 +124,8 @@ func (m *UniMiddleware) AddHandler(handlers ...EventHandler[Event]) {
 // Do 执行中间件，返回值为false表示事件被中间件截断
 func (m *UniMiddleware) Do(event Event) bool {
 	for _, handler := range m.Handlers {
-		event = handler(event)
+		h := handler
+		event = h(event)
 		if event == nil {
 			return false // 事件被中间件截断
 		}
@@ -131,7 +138,9 @@ func (m *UniMiddleware) DoAsync(event Event) {
 	// 使用 goroutine 并发执行中间件
 	go func() {
 		for _, handler := range m.Handlers {
-			handler(event)
+			h := handler // 避免闭包陷阱
+			e := event.Clone()
+			h(e)
 		}
 	}()
 }

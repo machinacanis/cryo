@@ -125,7 +125,7 @@ func (c *LagrangeClient) AfterLogin() {
 	// 登录成功后，保存签名
 	c.Uin = c.Client.Sig().Uin
 	c.Uid = c.Client.Sig().UID
-	//SendBotConnectedEvent(c)       // 发送登录成功事件
+	c.sendBotConnectedEvent()        // 发送登录成功事件
 	if c.conf.EnableClientAutoSave { // 如果启用了自动保存
 		err := c.Save()
 		if err != nil {
@@ -221,6 +221,27 @@ func (c *LagrangeClient) watingForLoginResult() bool {
 		return false
 	}
 	return true
+}
+
+// sendBotConnectedEvent 发送bot连接事件
+func (c *LagrangeClient) sendBotConnectedEvent() {
+	// 发送bot连接事件
+	c.bus.Publish(&BotConnectedEvent{
+		UniEvent: UniEvent{
+			payload:     nil,
+			EventType:   BotConnectedEventType,
+			EventId:     newUUID(),
+			EventTags:   []string{"cryo", "bot_connected"},
+			Time:        uint32(time.Now().Unix()),
+			botClient:   c,
+			BotId:       c.Id,
+			BotNickname: c.Nickname,
+			BotUin:      c.Uin,
+			BotUid:      c.Uid,
+			Platform:    c.Platform,
+		},
+		Version: c.Version,
+	})
 }
 
 // SendPrivateMessage 发送私聊消息

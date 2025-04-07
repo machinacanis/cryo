@@ -40,7 +40,7 @@ func WriteClientInfos(clientInfos []ClientInfo) error {
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 

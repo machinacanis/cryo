@@ -196,6 +196,11 @@ func (b *Bot) GetClient(event Event) *LagrangeClient {
 	return b.GetClientById(event.GetUniEvent().BotId)
 }
 
+// GetBus 获取事件总线
+func (b *Bot) GetBus() *EventBus {
+	return b.bus
+}
+
 func (b *Bot) Send(event MessageEvent, args ...interface{}) (ok bool, messageId uint32) {
 	// 根据事件获取对应的bot客户端
 	return b.GetClient(event).Send(event, args...)
