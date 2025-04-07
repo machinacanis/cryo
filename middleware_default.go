@@ -57,7 +57,7 @@ func setDefaultMiddleware(bus *EventBus, conf *Config) {
 		mw := NewUniMiddleware()
 		mw.AddHandler(func(e Event) Event {
 			u := e.GetUniEvent()
-			log.Debugf("[EventPublish] %s from %s(%d) with Id %s and Tags %v", u.GetEventType().ToString(), u.BotNickname, u.BotUin, u.BotId, u.EventTags)
+			log.Debugf("[EventPublish] %s from %s(%d) with Id %s and Tags %v", u.GetEventType().ToString(), u.BotNickname, u.BotUin, u.EventId, u.EventTags)
 			return e
 		})
 		bus.AddPreMiddleware(mw)

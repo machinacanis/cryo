@@ -141,7 +141,7 @@ func (r *OnResponser) AddHandler(handler EventHandler[Event], ordering Middlewar
 func (r *OnResponser) Handle(handler interface{}, ordering ...MiddlewareOrdering) *OnResponser {
 	var o MiddlewareOrdering
 	if len(ordering) == 0 {
-		o = SyncMiddlewareType
+		o = AsyncMiddlewareType
 	} else {
 		o = ordering[0]
 	}

@@ -15,14 +15,12 @@ func main() {
 	})
 
 	cryo.NewOnResponser(bot.GetBus(), cryo.PrivateMessageEventType, cryo.GroupMessageEventType).
-		Handle(func(e *cryo.PrivateMessageEvent) *cryo.PrivateMessageEvent {
+		Handle(func(e *cryo.PrivateMessageEvent) {
 			log.Info("这是一条私聊消息！")
-			return e
-		}).
-		Handle(func(e *cryo.GroupMessageEvent) *cryo.GroupMessageEvent {
+		}, cryo.AsyncMiddlewareType).
+		Handle(func(e *cryo.GroupMessageEvent) {
 			log.Info("这是一条群消息！")
-			return e
-		}).
+		}, cryo.AsyncMiddlewareType).
 		Register()
 
 	bot.AutoConnect()
