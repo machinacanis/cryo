@@ -34,210 +34,210 @@ type MessageElement interface {
 
 // Text 文本元素
 type Text struct {
-	ele lgrmessage.TextElement
+	lgrmessage.TextElement
 }
 
 // At 提及元素
 type At struct {
-	ele lgrmessage.AtElement
+	lgrmessage.AtElement
 }
 
 // Face 表情元素
 type Face struct {
-	ele lgrmessage.FaceElement
+	lgrmessage.FaceElement
 }
 
 // Reply 回复元素
 type Reply struct {
-	ele lgrmessage.ReplyElement
+	lgrmessage.ReplyElement
 }
 
 // Voice 语音元素
 type Voice struct {
-	ele lgrmessage.VoiceElement
+	lgrmessage.VoiceElement
 }
 
 // Image 图片元素
 type Image struct {
-	ele lgrmessage.ImageElement
+	lgrmessage.ImageElement
 }
 
 // File 文件元素
 type File struct {
-	ele lgrmessage.FileElement
+	lgrmessage.FileElement
 }
 
 // ShortVideo 短视频元素
 type ShortVideo struct {
-	ele lgrmessage.ShortVideoElement
+	lgrmessage.ShortVideoElement
 }
 
 // LightApp 轻应用元素
 type LightApp struct {
-	ele lgrmessage.LightAppElement
+	lgrmessage.LightAppElement
 }
 
 // XML 服务元素
 type XML struct {
-	ele lgrmessage.XMLElement
+	lgrmessage.XMLElement
 }
 
 // ForwardMessage 转发消息元素
 type ForwardMessage struct {
-	ele lgrmessage.ForwardMessage
+	lgrmessage.ForwardMessage
 }
 
 // MarketFace 魔法表情元素
 type MarketFace struct {
-	ele lgrmessage.MarketFaceElement
+	lgrmessage.MarketFaceElement
 }
 
-func (e Text) GetType() ElementType           { return TextType }
-func (e At) GetType() ElementType             { return AtType }
-func (e Face) GetType() ElementType           { return FaceType }
-func (e Reply) GetType() ElementType          { return ReplyType }
-func (e Voice) GetType() ElementType          { return VoiceType }
-func (e Image) GetType() ElementType          { return ImageType }
-func (e File) GetType() ElementType           { return FileType }
-func (e ShortVideo) GetType() ElementType     { return VideoType }
-func (e LightApp) GetType() ElementType       { return LightAppType }
-func (e XML) GetType() ElementType            { return ServiceType }
-func (e ForwardMessage) GetType() ElementType { return ForwardType }
-func (e MarketFace) GetType() ElementType     { return MarketFaceType }
+func (e *Text) GetType() ElementType           { return TextType }
+func (e *At) GetType() ElementType             { return AtType }
+func (e *Face) GetType() ElementType           { return FaceType }
+func (e *Reply) GetType() ElementType          { return ReplyType }
+func (e *Voice) GetType() ElementType          { return VoiceType }
+func (e *Image) GetType() ElementType          { return ImageType }
+func (e *File) GetType() ElementType           { return FileType }
+func (e *ShortVideo) GetType() ElementType     { return VideoType }
+func (e *LightApp) GetType() ElementType       { return LightAppType }
+func (e *XML) GetType() ElementType            { return ServiceType }
+func (e *ForwardMessage) GetType() ElementType { return ForwardType }
+func (e *MarketFace) GetType() ElementType     { return MarketFaceType }
 
-func (e Text) GetLgrElementType() lgrmessage.ElementType {
+func (e *Text) GetLgrElementType() lgrmessage.ElementType {
 	return lgrmessage.Text
 }
-func (e At) GetLgrElementType() lgrmessage.ElementType {
+func (e *At) GetLgrElementType() lgrmessage.ElementType {
 	return lgrmessage.At
 }
-func (e Face) GetLgrElementType() lgrmessage.ElementType {
+func (e *Face) GetLgrElementType() lgrmessage.ElementType {
 	return lgrmessage.Face
 }
-func (e Reply) GetLgrElementType() lgrmessage.ElementType {
+func (e *Reply) GetLgrElementType() lgrmessage.ElementType {
 	return lgrmessage.Reply
 }
-func (e Voice) GetLgrElementType() lgrmessage.ElementType {
+func (e *Voice) GetLgrElementType() lgrmessage.ElementType {
 	return lgrmessage.Voice
 }
-func (e Image) GetLgrElementType() lgrmessage.ElementType {
+func (e *Image) GetLgrElementType() lgrmessage.ElementType {
 	return lgrmessage.Image
 }
-func (e File) GetLgrElementType() lgrmessage.ElementType {
+func (e *File) GetLgrElementType() lgrmessage.ElementType {
 	return lgrmessage.File
 }
-func (e ShortVideo) GetLgrElementType() lgrmessage.ElementType {
+func (e *ShortVideo) GetLgrElementType() lgrmessage.ElementType {
 	return lgrmessage.Video
 }
-func (e LightApp) GetLgrElementType() lgrmessage.ElementType {
+func (e *LightApp) GetLgrElementType() lgrmessage.ElementType {
 	return lgrmessage.LightApp
 }
-func (e XML) GetLgrElementType() lgrmessage.ElementType {
+func (e *XML) GetLgrElementType() lgrmessage.ElementType {
 	return lgrmessage.Service
 }
-func (e ForwardMessage) GetLgrElementType() lgrmessage.ElementType {
+func (e *ForwardMessage) GetLgrElementType() lgrmessage.ElementType {
 	return lgrmessage.Forward
 }
-func (e MarketFace) GetLgrElementType() lgrmessage.ElementType {
+func (e *MarketFace) GetLgrElementType() lgrmessage.ElementType {
 	return lgrmessage.MarketFace
 }
 
-func (e Text) GetIMessageElement() lgrmessage.IMessageElement {
-	return &e.ele
+func (e *Text) GetIMessageElement() lgrmessage.IMessageElement {
+	return &e.TextElement
 }
 
-func (e At) GetIMessageElement() lgrmessage.IMessageElement {
-	return &e.ele
+func (e *At) GetIMessageElement() lgrmessage.IMessageElement {
+	return &e.AtElement
 }
 
-func (e Face) GetIMessageElement() lgrmessage.IMessageElement {
-	return &e.ele
+func (e *Face) GetIMessageElement() lgrmessage.IMessageElement {
+	return &e.FaceElement
 }
 
-func (e Reply) GetIMessageElement() lgrmessage.IMessageElement {
-	return &e.ele
+func (e *Reply) GetIMessageElement() lgrmessage.IMessageElement {
+	return &e.ReplyElement
 }
 
-func (e Voice) GetIMessageElement() lgrmessage.IMessageElement {
-	return &e.ele
+func (e *Voice) GetIMessageElement() lgrmessage.IMessageElement {
+	return &e.VoiceElement
 }
 
-func (e Image) GetIMessageElement() lgrmessage.IMessageElement {
-	return &e.ele
+func (e *Image) GetIMessageElement() lgrmessage.IMessageElement {
+	return &e.ImageElement
 }
 
-func (e File) GetIMessageElement() lgrmessage.IMessageElement {
-	return &e.ele
+func (e *File) GetIMessageElement() lgrmessage.IMessageElement {
+	return &e.FileElement
 }
 
-func (e ShortVideo) GetIMessageElement() lgrmessage.IMessageElement {
-	return &e.ele
+func (e *ShortVideo) GetIMessageElement() lgrmessage.IMessageElement {
+	return &e.ShortVideoElement
 }
 
-func (e LightApp) GetIMessageElement() lgrmessage.IMessageElement {
-	return &e.ele
+func (e *LightApp) GetIMessageElement() lgrmessage.IMessageElement {
+	return &e.LightAppElement
 }
 
-func (e XML) GetIMessageElement() lgrmessage.IMessageElement {
-	return &e.ele
+func (e *XML) GetIMessageElement() lgrmessage.IMessageElement {
+	return &e.XMLElement
 }
 
-func (e ForwardMessage) GetIMessageElement() lgrmessage.IMessageElement {
-	return &e.ele
+func (e *ForwardMessage) GetIMessageElement() lgrmessage.IMessageElement {
+	return &e.ForwardMessage
 }
 
-func (e MarketFace) GetIMessageElement() lgrmessage.IMessageElement {
-	return &e.ele
+func (e *MarketFace) GetIMessageElement() lgrmessage.IMessageElement {
+	return &e.MarketFaceElement
 }
 
-func (e Text) ToString() string {
-	return e.ele.Content
+func (e *Text) ToString() string {
+	return e.Content
 }
 
-func (e At) ToString() string {
-	return fmt.Sprintf("[@%d %s]", e.ele.TargetUin, e.ele.Display)
+func (e *At) ToString() string {
+	return fmt.Sprintf("[@%d %s]", e.TargetUin, e.Display)
 }
 
-func (e Face) ToString() string {
-	return fmt.Sprintf("[表情 %d]", e.ele.FaceID)
+func (e *Face) ToString() string {
+	return fmt.Sprintf("[表情 %d]", e.FaceID)
 }
 
-func (e Reply) ToString() string {
+func (e *Reply) ToString() string {
 	return fmt.Sprintf(
 		"[回复 %d 于 %s 发送的消息 %s]",
-		e.ele.SenderUin, time.Unix(int64(e.ele.Time), 0).Format("2006-01-02 15:04:05"),
-		IMessageElementsToString(e.ele.Elements),
+		e.SenderUin, time.Unix(int64(e.Time), 0).Format("2006-01-02 15:04:05"),
+		IMessageElementsToString(e.Elements),
 	) // DONE：有空记得改了这里的回复消息显示
 }
 
-func (e Voice) ToString() string {
-	return fmt.Sprintf("[语音 %ds]", e.ele.Duration)
+func (e *Voice) ToString() string {
+	return fmt.Sprintf("[语音 %ds]", e.Duration)
 }
 
-func (e Image) ToString() string {
-	return fmt.Sprintf("[图片 %s]", e.ele.URL)
+func (e *Image) ToString() string {
+	return fmt.Sprintf("[图片 %s]", e.URL)
 }
 
-func (e File) ToString() string {
-	return fmt.Sprintf("[文件 %s]", e.ele.FileURL)
+func (e *File) ToString() string {
+	return fmt.Sprintf("[文件 %s]", e.FileURL)
 }
 
-func (e ShortVideo) ToString() string {
-	return fmt.Sprintf("[视频 %s]", e.ele.URL)
+func (e *ShortVideo) ToString() string {
+	return fmt.Sprintf("[视频 %s]", e.URL)
 }
 
-func (e LightApp) ToString() string {
-	return fmt.Sprintf("[轻应用 %s]", e.ele.AppName)
+func (e *LightApp) ToString() string {
+	return fmt.Sprintf("[轻应用 %s]", e.AppName)
 }
 
-func (e XML) ToString() string {
-	return fmt.Sprintf("[服务 %d]", e.ele.ServiceID)
+func (e *XML) ToString() string {
+	return fmt.Sprintf("[服务 %d]", e.ServiceID)
 }
 
-func (e ForwardMessage) ToString() string {
+func (e *ForwardMessage) ToString() string {
 	return "[转发消息]"
 }
 
-func (e MarketFace) ToString() string {
-	return fmt.Sprintf("[魔法表情 %s]", e.ele.Summary)
+func (e *MarketFace) ToString() string {
+	return fmt.Sprintf("[魔法表情 %s]", e.Summary)
 }
