@@ -27,10 +27,6 @@ go get -u github.com/machinacanis/cryo
 
 [`script/example.go`](https://github.com/machinacanis/cryo/blob/main/script/example.go)是一个最小化的聊天机器人示例，展示了如何使用 cryo 框架登录账号并处理消息。
 
-你可以查看[文档]()以查看完整的框架功能介绍及一个更全面的示例。
-
-[cryo-plugin-echo](https://github.com/machinacanis/cryo-plugin-echo) 是一个简单的 cryo 插件示例，展示了如何使用插件系统来更方便的组织代码。
-
 ```go
 // 尚处于开发阶段，API 可能会有变动
 // 仅供参考
@@ -62,6 +58,11 @@ func main() {
 }
 
 ```
+
+查看 [文档]() 以查看完整的框架功能介绍及一个更全面的示例。
+
+> [cryo-plugin-echo](https://github.com/machinacanis/cryo-plugin-echo) 是一个简单的 cryo 插件示例，展示了如何使用插件系统来更方便的组织代码。
+
 
 ## Thanks！
 
