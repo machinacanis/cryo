@@ -1,8 +1,11 @@
 # 🧊Cryo
 ![Go Badge](https://img.shields.io/badge/Go-1.24%2B-cyan?logo=go)
+![GitHub Tag](https://img.shields.io/github/v/release/machinacanis/cryo)
 [![goreportcard](https://img.shields.io/badge/go%20report-A+-brightgreen.svg?style=flat)](https://goreportcard.com/report/github.com/machinacanis/cryo)
+![GitHub License](https://img.shields.io/github/license/machinacanis/cryo)
+[![GoDoc](https://img.shields.io/badge/godoc-reference-blue)](http://pkg.go.dev/github.com/machinacanis/cryo)
 
-🚧锐意开发中...
+🚧开发中...
 
 cryo 是一个轻量级聊天机器人开发框架，通过嵌入协议实现  [LagrangeGo](https://github.com/LagrangeDev/LagrangeGo)  来实现简单的部署和迁移。
 
@@ -61,13 +64,6 @@ func main() {
 }
 
 ```
-
-## 开发进度
-- [x] 基本的登录及信息保存功能
-- [x] 多Bot连接支持
-- [x] 消息处理
-- [x] 消息去重
-- [x] 客户端获取
 
 ## Thanks！！！
 

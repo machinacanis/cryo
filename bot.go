@@ -6,11 +6,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Bot cryo 的Bot封装
 type Bot struct {
 	initFlag         bool                       // 是否初始化完成
 	ConnectedClients map[string]*LagrangeClient // 已连接的Bot客户端集合
 	bus              *EventBus                  // 事件总线
 	conf             Config                     // 配置项
+	plugin           []Plugin                   // 插件列表
 }
 
 // NewBot 创建一个新的CryoBot实例
@@ -27,6 +29,7 @@ func (b *Bot) Init(c ...Config) {
 	defaultConfig := Config{
 		LogLevel:                     logrus.InfoLevel,
 		SignServers:                  []string{DefaultSignServer},
+		EnablePluginAutoLoad:         true,
 		EnableClientAutoSave:         true,
 		EnablePrintLogo:              true,
 		EnableConnectPrintMiddleware: true,
@@ -46,6 +49,9 @@ func (b *Bot) Init(c ...Config) {
 		}
 		if c[0].SignServers != nil {
 			defaultConfig.SignServers = c[0].SignServers
+		}
+		if c[0].EnablePluginAutoLoad {
+			defaultConfig.EnablePluginAutoLoad = c[0].EnablePluginAutoLoad
 		}
 		if c[0].EnableClientAutoSave {
 			defaultConfig.EnableClientAutoSave = c[0].EnableClientAutoSave
@@ -199,6 +205,70 @@ func (b *Bot) GetClient(event Event) *LagrangeClient {
 // GetBus 获取事件总线
 func (b *Bot) GetBus() *EventBus {
 	return b.bus
+}
+
+// AddPlugin 添加插件
+func (b *Bot) AddPlugin(plugin ...Plugin) {
+	for _, p := range plugin {
+		err := p.Init(b)
+		if err != nil {
+			log.Errorf("插件 %s 初始化失败：%v", p.GetPluginName(), err)
+		}
+		if conf.EnablePluginAutoLoad { // 如果启用自动加载插件
+			p.Enable()
+		}
+		b.plugin = append(b.plugin, p)
+	}
+}
+
+// GetPlugin 获取插件
+func (b *Bot) GetPlugin(name string) []Plugin {
+	var plugins []Plugin
+	for _, p := range b.plugin {
+		if p.GetPluginName() == name {
+			plugins = append(plugins, p)
+		}
+	}
+	return plugins
+}
+
+// GetEnabledPlugin 获取启用的插件
+func (b *Bot) GetEnabledPlugin() []Plugin {
+	var plugins []Plugin
+	for _, p := range b.plugin {
+		if p.IsEnable() {
+			plugins = append(plugins, p)
+		}
+	}
+	return plugins
+}
+
+// GetDisabledPlugin 获取禁用的插件
+func (b *Bot) GetDisabledPlugin() []Plugin {
+	var plugins []Plugin
+	for _, p := range b.plugin {
+		if !p.IsEnable() {
+			plugins = append(plugins, p)
+		}
+	}
+	return plugins
+}
+
+// GetAllPlugin 获取所有插件
+func (b *Bot) GetAllPlugin() []Plugin {
+	return b.plugin
+}
+
+// RemovePlugin 移除插件
+func (b *Bot) RemovePlugin(plugin ...Plugin) {
+	for _, p := range plugin {
+		for i, pl := range b.plugin {
+			if pl.GetPluginName() == p.GetPluginName() {
+				b.plugin = append(b.plugin[:i], b.plugin[i+1:]...)
+				break
+			}
+		}
+	}
 }
 
 // Send 快速根据事件内容发送消息
