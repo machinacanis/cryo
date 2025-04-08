@@ -5,7 +5,7 @@ go 1.24
 require (
 	github.com/LagrangeDev/LagrangeGo v0.1.3
 	github.com/go-json-experiment/json v0.0.0-20250223041408-d3c622f1b874
-	github.com/satori/go.uuid v1.2.0
+	github.com/google/uuid v1.6.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 )

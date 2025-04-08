@@ -4,7 +4,7 @@ import (
 	"fmt"
 	lgrMsg "github.com/LagrangeDev/LagrangeGo/message"
 	"github.com/go-json-experiment/json"
-	uuid "github.com/satori/go.uuid"
+	uuid "github.com/google/uuid"
 	"github.com/skip2/go-qrcode"
 	"math/rand"
 	"strconv"
@@ -18,7 +18,7 @@ func randomDeviceNumber() int {
 }
 
 func newUUID() string {
-	return uuid.NewV4().String()
+	return uuid.New().String()
 }
 
 func newNickname() string {
