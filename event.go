@@ -81,6 +81,8 @@ type MessageEvent interface {
 	GetMessage() *Message                                                                                    // 获取消息元素
 	GetIMessageElements() []lgrmessage.IMessageElement                                                       // 获取消息元素的LagrangeGo格式
 	GetMessageId() uint32                                                                                    // 获取消息ID
+	Send(args ...interface{}) (ok bool, messageId uint32)                                                    // 发送消息
+	Reply(args ...interface{}) (ok bool, messageId uint32)                                                   // 回复消息
 }
 
 // UniMessageEvent 是消息事件的基础模型，其他消息事件都由这个事件组合而成
@@ -143,6 +145,16 @@ func (e *UniMessageEvent) Clone() Event {
 		GroupName:       e.GroupName,
 		MessageElements: e.MessageElements,
 	}
+}
+
+func (e *UniMessageEvent) Send(args ...interface{}) (ok bool, messageId uint32) {
+	// 发送消息
+	return e.botClient.Send(e, args...)
+}
+
+func (e *UniMessageEvent) Reply(args ...interface{}) (ok bool, messageId uint32) {
+	// 回复消息
+	return e.botClient.Send(e, args...)
 }
 
 type (

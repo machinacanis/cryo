@@ -285,9 +285,9 @@ func (c *LagrangeClient) Send(event MessageEvent, args ...interface{}) (ok bool,
 	case PrivateMessageEventType:
 		return c.SendPrivateMessage(event.GetUniMessageEvent().SenderUin, m)
 	case GroupMessageEventType:
-		return c.SendPrivateMessage(event.GetUniMessageEvent().SenderUin, m)
+		return c.SendGroupMessage(event.GetUniMessageEvent().GroupUin, m)
 	case TempMessageEventType:
-		return c.SendPrivateMessage(event.GetUniMessageEvent().SenderUin, m)
+		return c.SendTempMessage(event.GetUniMessageEvent().GroupUin, event.GetUniMessageEvent().SenderUin, m)
 	case UniMessageEventType:
 		me := event.GetUniMessageEvent()
 		// 通过tag来判断消息类型

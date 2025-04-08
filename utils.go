@@ -146,6 +146,9 @@ func ProcessMessageContent(args ...interface{}) *Message {
 		case Message:
 			// 如果参数是CryoMessage，则将其添加到消息元素中
 			result.Add(v...)
+		case *Message:
+			// 如果参数是指向CryoMessage的指针，则将其添加到消息元素中
+			result.Add(*v...)
 		}
 	}
 	return &result

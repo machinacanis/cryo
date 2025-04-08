@@ -214,7 +214,7 @@ func (b *Bot) AddPlugin(plugin ...Plugin) {
 		if err != nil {
 			log.Errorf("插件 %s 初始化失败：%v", p.GetPluginName(), err)
 		}
-		if conf.EnablePluginAutoLoad { // 如果启用自动加载插件
+		if b.conf.EnablePluginAutoLoad { // 如果启用自动加载插件
 			p.Enable()
 		}
 		b.plugin = append(b.plugin, p)
