@@ -162,3 +162,13 @@ func Contains[T string | uint32 | int | EventType](slice []T, item T) bool {
 	}
 	return false
 }
+
+// ContainsKeyword 辅助函数，检查字符串中是否包含子串
+func ContainsKeyword(s, substr string) bool {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
+}
