@@ -22,7 +22,7 @@ go get github.com/machinacanis/cryo
 
 ## 快速开始
 
-`script/example.go`是一个最小化的聊天机器人示例，展示了如何使用 cryobot 框架登录账号并处理消息。
+`script/example.go`是一个最小化的聊天机器人示例，展示了如何使用 cryo 框架登录账号并处理消息。
 
 你可以查看[文档]()以查看完整的框架功能介绍及一个更全面的示例。
 
@@ -71,7 +71,7 @@ func main() {
 
 ## Thanks！！！
 
-cryobot基于这些开源项目：
+cryo基于这些开源项目：
 
 - [Lagrange.Core](https://github.com/LagrangeDev/Lagrange.Core) | NTQQ 协议实现
 - [LagrangeGo](https://github.com/LagrangeDev/LagrangeGo) | Lagrange.Core 的 Go 语言实现
@@ -83,7 +83,7 @@ cryobot基于这些开源项目：
 
 ## 在找兼容Onebot协议的开发框架？
 
-cryobot 是一个通过内嵌的协议实现来连接客户端的开发框架，它是**针对单一平台的使用场景特化**的，如果你想要一个兼容 Onebot 协议的框架，应该看看这些项目：
+cryo 是一个通过内嵌的协议实现来连接客户端的开发框架，它是**针对单一平台的使用场景特化**的，如果你想要一个兼容 Onebot 协议的框架，应该看看这些项目：
 
 - [ZeroBot](https://github.com/wdvxdr1123/ZeroBot) | 基于 Onebot 协议的 Golang 机器人开发框架
 - [Nonebot2](https://github.com/nonebot/nonebot2) | 跨平台 Python 异步聊天机器人框架

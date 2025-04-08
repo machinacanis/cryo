@@ -1,7 +1,5 @@
 package cryo
 
-import "github.com/machinacanis/cryo/log"
-
 // Wrapper 带泛型的事件处理函数包装器
 func Wrapper[T Event](handler func(T)) func(Event) Event {
 	return func(e Event) Event {
@@ -32,6 +30,7 @@ type Responser interface {
 	Response(func(Event) Event) Responser        // 处理事件
 	Register()                                   // 注册响应器
 	Remove()                                     // 移除响应器注册的所有中间件
+
 }
 
 // UniResponser 是一个基础的事件响应器实现
@@ -117,13 +116,15 @@ func NewUniResponser(bus *EventBus, eventType ...EventType) *UniResponser {
 // OnResponser 默认事件响应器实现
 type OnResponser struct {
 	UniResponser
-	preMiddleware   Middleware // 预处理中间件列表
-	postMiddleware  Middleware // 后处理中间件列表
-	asyncMiddleware Middleware // 异步处理中间件列表
-	syncMiddleware  Middleware // 同步处理中间件列表
+	preMiddleware   Middleware    // 预处理中间件列表
+	postMiddleware  Middleware    // 后处理中间件列表
+	asyncMiddleware Middleware    // 异步处理中间件列表
+	syncMiddleware  Middleware    // 同步处理中间件列表
+	rules           []Rule[Event] // 响应器的规则列表
 }
 
-func (r *OnResponser) AddHandler(handler EventHandler[Event], ordering MiddlewareOrdering) {
+// AddHandler 添加事件处理器
+func (r *OnResponser) AddHandler(handler EventHandler[Event], ordering MiddlewareOrdering) *OnResponser {
 	switch ordering {
 	case PreMiddlewareType:
 		r.preMiddleware.AddHandler(handler)
@@ -136,149 +137,10 @@ func (r *OnResponser) AddHandler(handler EventHandler[Event], ordering Middlewar
 	default:
 		r.asyncMiddleware.AddHandler(handler)
 	}
-}
-
-func (r *OnResponser) Handle(handler interface{}, ordering ...MiddlewareOrdering) *OnResponser {
-	var o MiddlewareOrdering
-	if len(ordering) == 0 {
-		o = AsyncMiddlewareType
-	} else {
-		o = ordering[0]
-	}
-
-	switch typedHandler := handler.(type) {
-	case func(event *PrivateMessageEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *PrivateMessageEvent) *PrivateMessageEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupMessageEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupMessageEvent) *GroupMessageEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *TempMessageEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *TempMessageEvent) *TempMessageEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *NewFriendRequestEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *NewFriendRequestEvent) *NewFriendRequestEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *NewFriendEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *NewFriendEvent) *NewFriendEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *FriendRecallEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *FriendRecallEvent) *FriendRecallEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *FriendRenameEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *FriendRenameEvent) *FriendRenameEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *FriendPokeEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *FriendPokeEvent) *FriendPokeEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupMemberPermissionUpdatedEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupMemberPermissionUpdatedEvent) *GroupMemberPermissionUpdatedEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupNameUpdatedEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupNameUpdatedEvent) *GroupNameUpdatedEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupMuteEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupMuteEvent) *GroupMuteEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupRecallEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupRecallEvent) *GroupRecallEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupMemberJoinRequestEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupMemberJoinRequestEvent) *GroupMemberJoinRequestEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupInviteEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupInviteEvent) *GroupInviteEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupMemberDecreaseEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupMemberDecreaseEvent) *GroupMemberDecreaseEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupDigestEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupDigestEvent) *GroupDigestEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupReactionEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupReactionEvent) *GroupReactionEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupMemberSpecialTitleUpdated):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *GroupMemberSpecialTitleUpdated) *GroupMemberSpecialTitleUpdated:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *BotConnectedEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *BotConnectedEvent) *BotConnectedEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *BotDisconnectedEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *BotDisconnectedEvent) *BotDisconnectedEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *CustomEvent):
-		w := Wrapper(typedHandler)
-		r.AddHandler(w, o)
-	case func(event *CustomEvent) *CustomEvent:
-		w := OrderdWrapper(typedHandler)
-		r.AddHandler(w, o)
-	default:
-		log.Error("传入了不支持的事件处理函数")
-	}
 	return r
 }
 
+// Register 注册响应器
 func (r *OnResponser) Register() {
 	// 将响应器的响应事件类型注入到中间件中
 	for _, et := range r.eventType {
@@ -334,4 +196,10 @@ func NewOnResponser(bus *EventBus, eventType ...EventType) *OnResponser {
 		asyncMiddleware: NewUniMiddleware(),
 		syncMiddleware:  NewUniMiddleware(),
 	}
+}
+
+// AddRule 添加规则
+func (r *OnResponser) AddRule(rule Rule[Event]) *OnResponser {
+	r.rules = append(r.rules, rule)
+	return r
 }

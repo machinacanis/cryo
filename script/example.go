@@ -14,12 +14,10 @@ func main() {
 		EnableEventDebugMiddleware:   true,
 	})
 
-	cryo.NewOnResponser(bot.GetBus(), cryo.PrivateMessageEventType, cryo.GroupMessageEventType).
+	bot.OnType(cryo.PrivateMessageEventType, cryo.GroupMessageEventType).
 		Handle(func(e *cryo.PrivateMessageEvent) {
-			log.Info("这是一条私聊消息！")
-		}, cryo.AsyncMiddlewareType).
-		Handle(func(e *cryo.GroupMessageEvent) {
-			log.Info("这是一条群消息！")
+			log.Info("响应事件 " + e.EventId)
+			// 自定义逻辑
 		}, cryo.AsyncMiddlewareType).
 		Register()
 

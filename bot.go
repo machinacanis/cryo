@@ -201,11 +201,13 @@ func (b *Bot) GetBus() *EventBus {
 	return b.bus
 }
 
+// Send 快速根据事件内容发送消息
 func (b *Bot) Send(event MessageEvent, args ...interface{}) (ok bool, messageId uint32) {
 	// 根据事件获取对应的bot客户端
 	return b.GetClient(event).Send(event, args...)
 }
 
+// Reply 快速根据事件内容回复消息
 func (b *Bot) Reply(event MessageEvent, args ...interface{}) (ok bool, messageId uint32) {
 	// 根据事件获取对应的bot客户端
 	return b.GetClient(event).Reply(event, args...)
