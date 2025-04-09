@@ -24,6 +24,7 @@ go.work
 *.json
 docs/.vitepress/dist
 docs/.vitepress/cache
+!docs/guides/*.png
 !package.json
 !package-lock.json
 /node_modules
