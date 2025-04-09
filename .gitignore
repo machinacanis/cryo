@@ -22,3 +22,7 @@ go.work
 /.idea
 *.png
 *.json
+docs/.vitepress/dist
+docs/.vitepress/cache
+!package.json
+/node_modules

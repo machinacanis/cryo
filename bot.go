@@ -212,9 +212,10 @@ func (b *Bot) AddPlugin(plugin ...Plugin) {
 	for _, p := range plugin {
 		err := p.Init(b)
 		if err != nil {
-			log.Errorf("插件 %s 初始化失败：%v", p.GetPluginName(), err)
+			log.Errorf("[Cryo] 插件 %s 初始化失败：%v", p.GetPluginName(), err)
 		}
 		if b.conf.EnablePluginAutoLoad { // 如果启用自动加载插件
+			log.Infof("[Cryo] 插件 %s 已加载", p.GetPluginName())
 			p.Enable()
 		}
 		b.plugin = append(b.plugin, p)
@@ -265,6 +266,7 @@ func (b *Bot) RemovePlugin(plugin ...Plugin) {
 		for i, pl := range b.plugin {
 			if pl.GetPluginName() == p.GetPluginName() {
 				b.plugin = append(b.plugin[:i], b.plugin[i+1:]...)
+				log.Infof("[Cryo] 插件 %s 已卸载", p.GetPluginName())
 				break
 			}
 		}
