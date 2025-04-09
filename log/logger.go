@@ -49,6 +49,9 @@ type Logger interface {
 	Errorf(format string, args ...interface{})
 	Fatalf(format string, args ...interface{})
 	Panicf(format string, args ...interface{})
+	Print(args ...interface{})
+	Println(args ...interface{})
+	Printf(format string, args ...interface{})
 }
 
 // CryoLogger 封装了logrus的日志记录器，提供了多种日志输出方式
@@ -312,6 +315,33 @@ func (cl *CryoLogger) Panicf(format string, args ...interface{}) {
 	}
 }
 
+// Print 在所有活跃的日志记录器上打印一条消息
+func (cl *CryoLogger) Print(args ...interface{}) {
+	cl.loggersMutex.RLock()
+	defer cl.loggersMutex.RUnlock()
+	for _, logger := range cl.activeLoggers {
+		logger.Print(args...)
+	}
+}
+
+// Println 在所有活跃的日志记录器上打印一条消息
+func (cl *CryoLogger) Println(args ...interface{}) {
+	cl.loggersMutex.RLock()
+	defer cl.loggersMutex.RUnlock()
+	for _, logger := range cl.activeLoggers {
+		logger.Println(args...)
+	}
+}
+
+// Printf 在所有活跃的日志记录器上打印格式化的消息
+func (cl *CryoLogger) Printf(format string, args ...interface{}) {
+	cl.loggersMutex.RLock()
+	defer cl.loggersMutex.RUnlock()
+	for _, logger := range cl.activeLoggers {
+		logger.Printf(format, args...)
+	}
+}
+
 /*
 
 以下是一些全局快捷方式，用于更方便的调用Logger
@@ -396,6 +426,21 @@ func Fatalf(format string, args ...interface{}) {
 // Panicf 在全局日志记录器上以 Panic 级别记录格式化的消息
 func Panicf(format string, args ...interface{}) {
 	logger.Panicf(format, args...)
+}
+
+// Print 在全局日志记录器上打印一条消息
+func Print(args ...interface{}) {
+	logger.Print(args...)
+}
+
+// Println 在全局日志记录器上打印一条消息
+func Println(args ...interface{}) {
+	logger.Println(args...)
+}
+
+// Printf 在全局日志记录器上打印格式化的消息
+func Printf(format string, args ...interface{}) {
+	logger.Printf(format, args...)
 }
 
 // InitTextLogger 初始化终端日志记录器
