@@ -59,9 +59,9 @@ func main() {
 
 ```
 
-查看 [文档]() 以查看完整的框架功能介绍及一个更全面的示例。
+查看 [文档](https://machinacanis.github.io/cryo/) 以查看完整的框架功能介绍及一个更全面的示例。
 
-> [cryo-plugin-echo](https://github.com/machinacanis/cryo-plugin-echo) 是一个简单的 cryo 插件示例，展示了如何使用插件系统来更方便的组织代码。
+> [cryo-plugin-echo](https://github.com/machinacanis/cryo-echo-plugin) 是一个简单的 cryo 插件示例，展示了如何使用插件系统来更方便的组织代码。
 
 
 ## Thanks！
@@ -77,10 +77,3 @@ cryo 基于这些开源项目：
 - [go-qrcode](https://github.com/skip2/go-qrcode) | 二维码生成 / 解析工具
 
 向这些项目的贡献者们致以最诚挚的感谢！
-
-## 在找兼容Onebot协议的开发框架？
-
-cryo 是一个通过内嵌的协议实现来连接客户端的开发框架，它是**针对单一平台的使用场景特化**的，如果你想要一个兼容 Onebot 协议的框架，应该看看这些项目：
-
-- [ZeroBot](https://github.com/wdvxdr1123/ZeroBot) | 基于 Onebot 协议的 Golang 机器人开发框架
-- [Nonebot2](https://github.com/nonebot/nonebot2) | 跨平台 Python 异步聊天机器人框架
