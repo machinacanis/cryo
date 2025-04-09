@@ -62,6 +62,7 @@ func getQRCodeString(content string) (result *string) {
 	return &str
 }
 
+// IMessageElementsToString 将LagrangeGo的消息元素列表转换为cryo的字符串输出格式
 func IMessageElementsToString(elements []lgrMsg.IMessageElement) string {
 	// 将LagrangeGo的消息元素列表转换为字符串
 	var result string
@@ -154,6 +155,7 @@ func ProcessMessageContent(args ...interface{}) *Message {
 	return &result
 }
 
+// Contains 辅助函数，检查切片中是否包含指定元素
 func Contains[T string | uint32 | int | EventType](slice []T, item T) bool {
 	for _, v := range slice {
 		if v == item {

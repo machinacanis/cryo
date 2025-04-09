@@ -18,7 +18,7 @@ func (b *Bot) OnType(eventType ...EventType) *OnResponser {
 
 // OnMessage 创建一个新的消息事件响应器
 //
-// 这个响应器和 OnType 类似，但是它只会响应消息事件，即 PrivateMessageEventType、GroupMessageEventType 和 TempMessageEventType
+// 这个响应器和 OnType 类似，但是它只会响应消息事件，即 PrivateMessageEventType 、 GroupMessageEventType 和 TempMessageEventType
 //
 // 你可以通过继续在 Handle 中传入 func(e *UniMessageEvent) 来统一处理消息事件，也可以分开匹配一个具体类型的事件
 func (b *Bot) OnMessage() *OnResponser {

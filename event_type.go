@@ -1,6 +1,6 @@
 package cryo
 
-// EventType 事件类型
+// EventType 事件类型的类型别名
 type EventType uint32
 
 const (
@@ -112,5 +112,6 @@ func AllEventTypes() []EventType {
 		GroupInviteEventType,
 		BotConnectedEventType,
 		BotDisconnectedEventType,
+		CustomEventType,
 	}
 }

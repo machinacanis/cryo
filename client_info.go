@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// ClientInfo 客户端持久化信息，用于保存Bot客户端数据，以便于自动登录
 type ClientInfo struct {
 	Id        string `json:"id"`
 	Platform  string `json:"platform"`
@@ -15,6 +16,7 @@ type ClientInfo struct {
 	Uid       string `json:"uid"`
 }
 
+// ReadClientInfos 从文件读取客户端信息
 func ReadClientInfos() ([]ClientInfo, error) {
 	data, err := os.ReadFile("client_infos.json")
 	if err != nil {
@@ -30,6 +32,7 @@ func ReadClientInfos() ([]ClientInfo, error) {
 	return clientInfos, nil
 }
 
+// WriteClientInfos 写入客户端信息到文件
 func WriteClientInfos(clientInfos []ClientInfo) error {
 	data, err := json.Marshal(clientInfos)
 	if err != nil {
@@ -44,6 +47,7 @@ func WriteClientInfos(clientInfos []ClientInfo) error {
 	return nil
 }
 
+// SaveClientInfo 保存客户端信息到文件
 func SaveClientInfo(clientInfo ClientInfo) error {
 	// 首先尝试读取现有的客户端信息
 	clientInfos, err := ReadClientInfos()
@@ -80,6 +84,7 @@ func SaveClientInfo(clientInfo ClientInfo) error {
 	return err
 }
 
+// RemoveClientInfo 从文件中删除指定ID的客户端信息
 func RemoveClientInfo(botId string) error {
 	// 读取现有的客户端信息
 	clientInfos, err := ReadClientInfos()

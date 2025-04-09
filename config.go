@@ -7,8 +7,9 @@ import (
 )
 
 var conf Config
-var DefaultSignServer = "https://sign.lagrangecore.org/api/sign/30366"
+var DefaultSignServer = "https://sign.lagrangecore.org/api/sign/30366" // 默认的签名服务器地址
 
+// Config cryo 的配置项，通过在 Bot.Init() 中传入来控制每个Bot实例的功能
 type Config struct {
 	LogLevel                     logrus.Level
 	LogFormat                    *logrus.Formatter
@@ -21,6 +22,7 @@ type Config struct {
 	EnableEventDebugMiddleware   bool     `json:"enable_event_debug_middleware,omitempty,omitzero"`   // 是否启用内置的事件调试中间件
 }
 
+// ReadCryoConfig 从文件读取配置项
 func ReadCryoConfig() (Config, error) {
 	data, err := os.ReadFile("cryo_config.json")
 	c := Config{}
@@ -35,6 +37,8 @@ func ReadCryoConfig() (Config, error) {
 
 	return c, nil
 }
+
+// WriteCryoConfig 写入配置项到文件
 func WriteCryoConfig(config Config) error {
 	data, err := json.Marshal(config)
 	if err != nil {

@@ -24,8 +24,19 @@ go mod init my-bot # 也可以标准一点，比如 github.com/yourname/my-bot
 go get -u github.com/machinacanis/cryo
 
 # 作为示例，安装一个简单的回显插件，你也可以不安装
-go get -u github.com/machinacanis/cryo-echo-plugin
+go get -u github.com/machinacanis/cryo-plugin-echo
 ```
+
+::: tip
+由于一些众所周知的原因，Go 语言的模块代理在国内网络环境下运行的......不是非常好，
+
+如果你刚刚接触 Go 开发，但是在拉取依赖或者在 VSCode 拉取开发工具时出现了网络问题，你应该试试设置 Go Modules 的全局代理环境变量。
+```shell
+go env -w GO111MODULE=on
+go env -w GOPROXY=https://goproxy.cn,direct
+```
+设置完成后最好重新打开当前的 Shell 会话，使用 `go env` 命令可以查看正在使用的 Go 环境变量配置。
+:::
 
 ## 启动并连接
 
@@ -38,7 +49,7 @@ package main
 
 import (
 	"github.com/machinacanis/cryo"
-	"github.com/machinacanis/cryo-echo-plugin"
+	"github.com/machinacanis/cryo-plugin-echo"
 )
 
 func main() {
@@ -46,7 +57,7 @@ func main() {
 	bot := cryo.NewBot() 
 	bot.Init() // 初始化 Bot
 
-	bot.AddPlugin(CryoEcho.Plugin()) // 注册插件
+	bot.AddPlugin(CryoPluginEcho.Instance) // 添加插件
 
 	bot.AutoConnect() // 自动连接 NTQQ 客户端
 	bot.Start() // 启动 Bot

@@ -12,6 +12,7 @@ import (
 // DefaultDarkFormatter 默认的暗色格式化样式
 type DefaultDarkFormatter struct{}
 
+// Format 实现logrus.Formatter接口
 func (f *DefaultDarkFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	// 根据日志级别设置不同的颜色
 	var textColor string
@@ -80,6 +81,7 @@ var lightPurple = RGB("#DDA0DD") // 浅紫色
 // DefaultLightFormatter 默认的亮色格式化样式
 type DefaultLightFormatter struct{}
 
+// Format 实现logrus.Formatter接口
 func (f *DefaultLightFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	// 根据日志级别设置不同的颜色
 	var textColor string

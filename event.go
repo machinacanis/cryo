@@ -2,7 +2,7 @@ package cryo
 
 import lgrmessage "github.com/LagrangeDev/LagrangeGo/message"
 
-// Event cryo的事件模型接口定义
+// Event cryo的事件模型接口
 type Event interface {
 	GetUniEvent() *UniEvent     // 获取事件的基础信息
 	GetEventType() EventType    // 获取事件类型
@@ -100,26 +100,32 @@ type UniMessageEvent struct {
 	MessageElements Message // 消息元素
 }
 
+// GetReplyDetail 获取回复用的部分消息内容
 func (e *UniMessageEvent) GetReplyDetail() (uint32, uint32, uint32, []lgrmessage.IMessageElement) {
 	return e.MessageId, e.SenderUin, e.Time, e.MessageElements.ToIMessageElements()
 }
 
+// GetUniMessageEvent 提取事件的基础消息事件结构
 func (e *UniMessageEvent) GetUniMessageEvent() *UniMessageEvent {
 	return e
 }
 
+// GetMessage 获取消息事件承载的消息元素
 func (e *UniMessageEvent) GetMessage() *Message {
 	return &e.MessageElements
 }
 
+// GetIMessageElements 获取消息事件的LagrangeGo消息元素
 func (e *UniMessageEvent) GetIMessageElements() []lgrmessage.IMessageElement {
 	return e.MessageElements.ToIMessageElements()
 }
 
+// GetMessageId 获取消息ID
 func (e *UniMessageEvent) GetMessageId() uint32 {
 	return e.MessageId
 }
 
+// Clone 克隆事件
 func (e *UniMessageEvent) Clone() Event {
 	// 克隆事件
 	return &UniMessageEvent{
@@ -147,11 +153,13 @@ func (e *UniMessageEvent) Clone() Event {
 	}
 }
 
+// Send 通过Bot客户端发送消息的一个快捷方式
 func (e *UniMessageEvent) Send(args ...interface{}) (ok bool, messageId uint32) {
 	// 发送消息
 	return e.botClient.Send(e, args...)
 }
 
+// Reply 通过Bot客户端回复消息的一个快捷方式
 func (e *UniMessageEvent) Reply(args ...interface{}) (ok bool, messageId uint32) {
 	// 回复消息
 	return e.botClient.Send(e, args...)
@@ -334,6 +342,7 @@ type (
 	BotDisconnectedEvent struct {
 		UniEvent
 	}
+	// CustomEvent 自定义事件
 	CustomEvent struct {
 		UniEvent
 		summury string      // 摘要

@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// ElementType 消息元素类型
+// ElementType 消息元素类型别名
 type ElementType int
 
 const (
@@ -25,6 +25,7 @@ const (
 	MarketFaceType                    // 魔法表情元素类型
 )
 
+// MessageElement 消息元素接口，实现该接口的元素都可以被添加到消息中
 type MessageElement interface {
 	GetType() ElementType                           // 获取元素类型
 	GetLgrElementType() lgrmessage.ElementType      // 获取LagrangeGo元素类型
@@ -207,7 +208,7 @@ func (e *Reply) ToString() string {
 		"[回复 %d 于 %s 发送的消息 %s]",
 		e.SenderUin, time.Unix(int64(e.Time), 0).Format("2006-01-02 15:04:05"),
 		IMessageElementsToString(e.Elements),
-	) // DONE：有空记得改了这里的回复消息显示
+	)
 }
 
 func (e *Voice) ToString() string {

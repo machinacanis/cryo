@@ -61,7 +61,7 @@ func main() {
 
 查看 [文档](https://machinacanis.github.io/cryo/) 以查看完整的框架功能介绍及一个更全面的示例。
 
-> [cryo-plugin-echo](https://github.com/machinacanis/cryo-echo-plugin) 是一个简单的 cryo 插件示例，展示了如何使用插件系统来更方便的组织代码。
+> [cryo-plugin-echo](https://github.com/machinacanis/cryo-plugin-echo) 是一个简单的 cryo 插件示例，展示了如何使用插件系统来更方便的组织代码。
 
 
 ## Thanks！

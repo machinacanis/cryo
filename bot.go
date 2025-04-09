@@ -1,12 +1,15 @@
 package cryo
 
 import (
+	"errors"
 	"fmt"
 	"github.com/machinacanis/cryo/log"
 	"github.com/sirupsen/logrus"
 )
 
 // Bot cryo 的Bot封装
+//
+// 提供了对Bot的操作和管理功能，可以通过 initFlag 来判断是否初始化完成
 type Bot struct {
 	initFlag         bool                       // 是否初始化完成
 	ConnectedClients map[string]*LagrangeClient // 已连接的Bot客户端集合
@@ -89,25 +92,34 @@ func (b *Bot) Init(c ...Config) {
 	b.initFlag = true
 }
 
+// IsInit 判断是否初始化完成
+func (b *Bot) IsInit() bool {
+	return b.initFlag
+}
+
 // Start 启动cryobot
-func (b *Bot) Start() {
+func (b *Bot) Start() error {
 	if !b.initFlag {
 		// 没有进行初始化
-		log.Fatal("cryobot 没有进行初始化，请先调用 Init() 函数进行初始化！")
+		log.Error("cryobot 没有进行初始化，请先调用 Init() 函数进行初始化！")
+		return errors.New("cryobot 没有进行初始化，请先调用 Init() 函数进行初始化！")
 	}
 	select {} // 阻塞主线程，运行事件循环
 }
 
-// AutoConnect 自动连接
-func (b *Bot) AutoConnect() {
+// AutoConnect 自动尝试建立连接，如果没有已保存的连接信息或已保存的连接信息无效，则尝试创建并连接新的bot客户端
+//
+// 如果已经有了连接过的bot客户端，则会跳过自动连接过程，你应该手动使用 ConnectNewClient 来新建连接
+func (b *Bot) AutoConnect() error {
 	if !b.initFlag {
 		// 没有进行初始化
-		log.Fatal("cryobot 没有进行初始化，请先调用 Init() 函数进行初始化！")
+		log.Error("cryobot 没有进行初始化，请先调用 Init() 函数进行初始化！")
+		return errors.New("cryobot 没有进行初始化，请先调用 Init() 函数进行初始化！")
 	}
 	// 首先检测是否已经连接
 	if len(b.ConnectedClients) > 0 {
 		// 跳过自动连接
-		return
+		return nil
 	}
 	// 尝试连接所有已保存的bot客户端
 	b.ConnectAllSavedClient()
@@ -118,8 +130,10 @@ func (b *Bot) AutoConnect() {
 		retriedCount++
 	}
 	if len(b.ConnectedClients) == 0 {
-		log.Fatal("达到最大重试次数，cryobot 无法连接到bot客户端，请检查网络或配置文件")
+		log.Error("达到最大重试次数，cryobot 无法连接到bot客户端，请检查网络或配置文件")
+		return errors.New("达到最大重试次数，cryobot 无法连接到bot客户端，请检查网络或配置文件")
 	}
+	return nil
 }
 
 // ConnectSavedClient 尝试查询并连接到指定的bot客户端

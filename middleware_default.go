@@ -3,6 +3,14 @@ package cryo
 import "github.com/machinacanis/cryo/log"
 
 // setDefaultMiddleware 设置默认的中间件
+//
+// 目前提供了以下中间件：
+//
+// 1. Bot连接状态打印中间件
+//
+// 2. 消息打印中间件
+//
+// 3. 事件调试中间件
 func setDefaultMiddleware(bus *EventBus, conf *Config) {
 	if conf.EnableConnectPrintMiddleware { // 是否启用连接状态打印中间件
 		log.Debug("[Cryo] 启用内置的Bot连接状态打印中间件")

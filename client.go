@@ -121,6 +121,7 @@ func (c *LagrangeClient) UseSignature(sig string) {
 	c.Client.UseSig(sigInfo)
 }
 
+// AfterLogin 登录成功后的处理函数，包含保存签名、绑定LagrangeGo的事件、发送登录成功事件及自动保存登录信息
 func (c *LagrangeClient) AfterLogin() {
 	// 登录成功后，保存签名
 	c.Uin = c.Client.Sig().Uin
@@ -196,7 +197,6 @@ func (c *LagrangeClient) QRCodeLogin() bool {
 	return true
 }
 
-// watingForLoginResult 等待扫码登录结果
 func (c *LagrangeClient) watingForLoginResult() bool {
 	//轮询登录状态
 	for {
@@ -223,7 +223,6 @@ func (c *LagrangeClient) watingForLoginResult() bool {
 	return true
 }
 
-// sendBotConnectedEvent 发送bot连接事件
 func (c *LagrangeClient) sendBotConnectedEvent() {
 	// 发送bot连接事件
 	c.bus.Publish(&BotConnectedEvent{
@@ -255,7 +254,7 @@ func (c *LagrangeClient) SendPrivateMessage(userUin uint32, msg *Message) (ok bo
 	return true, message.ID
 }
 
-// SendGroupMessage 发送群消息
+// SendGroupMessage 发送群聊消息
 func (c *LagrangeClient) SendGroupMessage(groupUin uint32, msg *Message) (ok bool, messageId uint32) {
 	// 发送群消息
 	message, err := c.Client.SendGroupMessage(groupUin, msg.ToIMessageElements())
@@ -277,6 +276,7 @@ func (c *LagrangeClient) SendTempMessage(groupUin, userUin uint32, msg *Message)
 	return true, message.ID
 }
 
+// Send 自动根据事件内容发送信息
 func (c *LagrangeClient) Send(event MessageEvent, args ...interface{}) (ok bool, messageId uint32) {
 	// 处理消息内容
 	m := ProcessMessageContent(args...)
@@ -304,6 +304,7 @@ func (c *LagrangeClient) Send(event MessageEvent, args ...interface{}) (ok bool,
 	return false, 0
 }
 
+// Reply 自动根据事件内容回复消息
 func (c *LagrangeClient) Reply(event MessageEvent, args ...interface{}) (ok bool, messageId uint32) {
 	// 处理消息内容
 	m := Message{}

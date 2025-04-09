@@ -1,5 +1,6 @@
 package log
 
+// Logo 一个简单的字符画，写的是 Cryobot
 var Logo = `` +
 	steelblue + `   ___                     _             _` + "\n" +
 	royalblue + `  / __\_ __  _   _   ___  | |__    ___  | |_` + "\n" +

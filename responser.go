@@ -172,6 +172,7 @@ func (r *OnResponser) Register() {
 	}
 }
 
+// Remove 移除响应器注册的所有中间件
 func (r *OnResponser) Remove() {
 	// 获取所有中间件的id
 	middlewareIds := make([]string, 0)

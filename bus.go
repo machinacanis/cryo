@@ -4,6 +4,7 @@ import (
 	"sync"
 )
 
+// MiddlewareOrdering 是中间件的执行顺序类型别名
 type MiddlewareOrdering int
 
 const (
@@ -58,7 +59,6 @@ func (bus *EventBus) applyPreMiddleware(event Event) Event {
 	return event // 返回事件
 }
 
-// applySyncMiddleware 应用处理中间件
 func (bus *EventBus) applySyncMiddleware(event Event) Event {
 	if len(bus.syncMiddleware) == 0 {
 		return event // 如果没有处理中间件，则直接返回事件
@@ -110,7 +110,6 @@ func (bus *EventBus) applySyncMiddleware(event Event) Event {
 	return event // 返回事件
 }
 
-// applyPostMiddleware 应用后处理中间件
 func (bus *EventBus) applyPostMiddleware(event Event) Event {
 	if len(bus.postMiddleware) == 0 {
 		return event // 如果没有后处理中间件，则直接返回事件
@@ -180,7 +179,7 @@ func (bus *EventBus) AddPreMiddleware(middleware ...Middleware) {
 	}
 }
 
-// AddSyncMiddleware 添加处理中间件
+// AddSyncMiddleware 添加同步中间件
 func (bus *EventBus) AddSyncMiddleware(middleware ...Middleware) {
 	bus.middlewareMutex.Lock() // 持有写锁
 	defer bus.middlewareMutex.Unlock()
@@ -198,7 +197,7 @@ func (bus *EventBus) AddPostMiddleware(middleware ...Middleware) {
 	}
 }
 
-// AddAsyncMiddleware 添加并发处理中间件
+// AddAsyncMiddleware 添加异步中间件
 func (bus *EventBus) AddAsyncMiddleware(middleware ...Middleware) {
 	bus.middlewareMutex.Lock() // 持有写锁
 	defer bus.middlewareMutex.Unlock()
@@ -308,7 +307,7 @@ func (bus *EventBus) ClearPreMiddleware() {
 	bus.preMiddleware = make([]Middleware, 0)
 }
 
-// ClearSyncMiddleware 清空处理中间件
+// ClearSyncMiddleware 清空同步中间件
 func (bus *EventBus) ClearSyncMiddleware() {
 	bus.middlewareMutex.Lock()
 	defer bus.middlewareMutex.Unlock()
@@ -322,6 +321,13 @@ func (bus *EventBus) ClearPostMiddleware() {
 	bus.postMiddleware = make([]Middleware, 0)
 }
 
+// ClearAsyncMiddleware 清空异步中间件
+func (bus *EventBus) ClearAsyncMiddleware() {
+	bus.middlewareMutex.Lock()
+	defer bus.middlewareMutex.Unlock()
+	bus.asyncMiddleware = make([]Middleware, 0)
+}
+
 // ClearAllMiddleware 清空所有中间件
 func (bus *EventBus) ClearAllMiddleware() {
 	bus.middlewareMutex.Lock()
@@ -331,7 +337,7 @@ func (bus *EventBus) ClearAllMiddleware() {
 	bus.postMiddleware = make([]Middleware, 0)
 }
 
-// Publish 发布事件，执行中间件
+// Publish 发布事件并按顺序执行中间件
 func (bus *EventBus) Publish(event Event) {
 	// 先执行预处理中间件
 	event = bus.applyPreMiddleware(event)
