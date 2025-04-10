@@ -24,6 +24,7 @@ type LagrangeClient struct {
 	initFlag bool   // 是否初始化完成
 	conf     Config // 配置项
 	bus      *EventBus
+	logger   log.CryoLogger
 }
 
 // NewLagrangeClient 创建一个新的LagrangeClient实例
@@ -32,10 +33,11 @@ func NewLagrangeClient() *LagrangeClient {
 }
 
 // Init 初始化一个新的LagrangeClient客户端
-func (c *LagrangeClient) Init(bus *EventBus, conf Config) {
+func (c *LagrangeClient) Init(bus *EventBus, logger log.CryoLogger, conf Config) {
 	c.Id = newUUID() // 给Bot客户端分配一个唯一的UUID
 	c.conf = conf
 	c.bus = bus
+	c.logger = logger
 
 	// 默认平台和版本
 	if c.Platform == "" {
@@ -47,7 +49,7 @@ func (c *LagrangeClient) Init(bus *EventBus, conf Config) {
 
 	appInfo := auth.AppList[c.Platform][c.Version]
 	c.Client = client.NewClient(0, "")
-	c.Client.SetLogger(log.PLogger) // 替换日志记录器，详见client/protocol_logger.go以及log/logger.go
+	c.Client.SetLogger(log.NewProtocolLogger(c.logger)) // 替换日志记录器，详见client/protocol_logger.go以及log/logger.go
 	c.Client.UseVersion(appInfo)
 	c.Client.AddSignServer(conf.SignServers...)
 	c.DeviceNum = randomDeviceNumber()
@@ -60,7 +62,7 @@ func (c *LagrangeClient) Init(bus *EventBus, conf Config) {
 // Rebuild 重新构建LagrangeClient实例
 func (c *LagrangeClient) Rebuild(clientInfo ClientInfo) bool {
 	if !c.initFlag {
-		log.Error("cryobot客户端没有完成初始化，请先调用Init()方法")
+		c.logger.Error("cryobot客户端没有完成初始化，请先调用Init()方法")
 		return false
 	}
 	var sig string
@@ -96,7 +98,7 @@ func (c *LagrangeClient) Save() error {
 func (c *LagrangeClient) GetSignature() string {
 	data, err := c.Client.Sig().Marshal()
 	if err != nil {
-		log.Error("序列化签名时出现错误：", err)
+		c.logger.Error("序列化签名时出现错误：", err)
 		return ""
 	}
 	// 将二进制的签名直接编码到字符串
@@ -109,13 +111,13 @@ func (c *LagrangeClient) UseSignature(sig string) {
 	// 将字符串解码为二进制
 	data, err := base64.StdEncoding.DecodeString(sig)
 	if err != nil {
-		log.Error("解码签名时出现错误：", err)
+		c.logger.Error("解码签名时出现错误：", err)
 		return
 	}
 	// 反序列化签名
 	sigInfo, err := auth.UnmarshalSigInfo(data, true)
 	if err != nil {
-		log.Error("反序列化签名时出现错误：", err)
+		c.logger.Error("反序列化签名时出现错误：", err)
 		return
 	}
 	c.Client.UseSig(sigInfo)
@@ -130,12 +132,12 @@ func (c *LagrangeClient) AfterLogin() {
 	if c.conf.EnableClientAutoSave { // 如果启用了自动保存
 		err := c.Save()
 		if err != nil {
-			log.Error("保存登录信息时出现错误：", err)
+			c.logger.Error("保存登录信息时出现错误：", err)
 		} // 保存登录信息
 	}
 
 	// 订阅事件
-	EventBind(c)
+	c.eventBind()
 }
 
 // GetQRCode 获取二维码信息
@@ -150,10 +152,10 @@ func (c *LagrangeClient) SaveQRCode(code []byte) bool {
 	qrcodePath := fmt.Sprintf("QRCode_%s.png", c.Id)
 	err := os.WriteFile(qrcodePath, code, 0644)
 	if err != nil {
-		log.Error("写入二维码图片时出现错误：", err)
+		c.logger.Error("写入二维码图片时出现错误：", err)
 		return false
 	}
-	log.Infof("登录二维码已保存到 %s", qrcodePath)
+	c.logger.Successf("登录二维码已保存到 %s", qrcodePath)
 	return true
 }
 
@@ -179,10 +181,10 @@ func (c *LagrangeClient) SignatureLogin() (ok bool) {
 
 // QRCodeLogin 使用二维码登录
 func (c *LagrangeClient) QRCodeLogin() bool {
-	log.Info("正在使用二维码登录...")
+	c.logger.Info("[Cryo] 正在使用二维码登录...")
 	code, url, err := c.GetQRCode()
 	if err != nil {
-		log.Error("获取二维码时出现错误：", err)
+		c.logger.Error("获取二维码时出现错误：", err)
 		return false
 	}
 	// 保存二维码图片
@@ -190,7 +192,7 @@ func (c *LagrangeClient) QRCodeLogin() bool {
 	// 向终端输出二维码
 	c.PrintQRCode(url)
 	if !c.watingForLoginResult() { // 等待扫码登录
-		log.Warn("扫码登录失败！")
+		c.logger.Warn("[Cryo] 扫码登录失败！")
 		return false
 	}
 	c.AfterLogin()
@@ -202,7 +204,7 @@ func (c *LagrangeClient) watingForLoginResult() bool {
 	for {
 		retCode, err := c.Client.GetQRCodeResult()
 		if err != nil {
-			log.Error("获取二维码登录结果时出现错误：", err)
+			c.logger.Error("获取二维码登录结果时出现错误：", err)
 			return false
 		}
 		// 等待扫码
@@ -217,7 +219,7 @@ func (c *LagrangeClient) watingForLoginResult() bool {
 	}
 	_, err := c.Client.QRCodeLogin()
 	if err != nil {
-		log.Error("二维码登录时出现错误：", err)
+		c.logger.Error("二维码登录时出现错误：", err)
 		return false
 	}
 	return true
@@ -248,7 +250,7 @@ func (c *LagrangeClient) SendPrivateMessage(userUin uint32, msg *Message) (ok bo
 	// 发送私聊消息
 	message, err := c.Client.SendPrivateMessage(userUin, msg.ToIMessageElements())
 	if err != nil {
-		log.Errorf("向用户 %d 发送消息时出现错误：%v", userUin, err)
+		c.logger.Errorf("向用户 %d 发送消息时出现错误：%v", userUin, err)
 		return false, 0
 	}
 	return true, message.ID
@@ -259,7 +261,7 @@ func (c *LagrangeClient) SendGroupMessage(groupUin uint32, msg *Message) (ok boo
 	// 发送群消息
 	message, err := c.Client.SendGroupMessage(groupUin, msg.ToIMessageElements())
 	if err != nil {
-		log.Errorf("向群 %d 发送消息时出现错误：%v", groupUin, err)
+		c.logger.Errorf("向群 %d 发送消息时出现错误：%v", groupUin, err)
 		return false, 0
 	}
 	return true, message.ID
@@ -270,7 +272,7 @@ func (c *LagrangeClient) SendTempMessage(groupUin, userUin uint32, msg *Message)
 	// 发送临时消息
 	message, err := c.Client.SendTempMessage(groupUin, userUin, msg.ToIMessageElements())
 	if err != nil {
-		log.Errorf("向与用户 %d 的临时会话发送消息时出现错误：%v", groupUin, err)
+		c.logger.Errorf("向与用户 %d 的临时会话发送消息时出现错误：%v", groupUin, err)
 		return false, 0
 	}
 	return true, message.ID
@@ -299,7 +301,7 @@ func (c *LagrangeClient) Send(event MessageEvent, args ...interface{}) (ok bool,
 			return c.SendTempMessage(me.GroupUin, me.SenderUin, m)
 		}
 	default:
-		log.Error("发送消息时传入了不支持的消息事件")
+		c.logger.Error("发送消息时传入了不支持的消息事件")
 	}
 	return false, 0
 }

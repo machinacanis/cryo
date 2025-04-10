@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"strconv"
 	"strings"
 )
@@ -28,4 +29,48 @@ func RGB(rgb string) string {
 	}
 	// 返回ANSI颜色代码
 	return fmt.Sprintf("\033[38;2;%d;%d;%dm", r, g, b)
+}
+
+// ConvertCryoLogLevelToLogrusLevel 将CryoLogLevel转换为logrus.Level
+func ConvertCryoLogLevelToLogrusLevel(level CryoLogLevel) logrus.Level {
+	switch level {
+	case DebugLevel:
+		return logrus.TraceLevel
+	case InfoLevel:
+		return logrus.DebugLevel
+	case SuccessLevel:
+		return logrus.InfoLevel
+	case WarnLevel:
+		return logrus.WarnLevel
+	case ErrorLevel:
+		return logrus.ErrorLevel
+	case FatalLevel:
+		return logrus.FatalLevel
+	case PanicLevel:
+		return logrus.PanicLevel
+	default:
+		return logrus.InfoLevel
+	}
+}
+
+// ConvertLogrusLevelToCryoLogLevel 将logrus.Level转换为CryoLogLevel
+func ConvertLogrusLevelToCryoLogLevel(level logrus.Level) CryoLogLevel {
+	switch level {
+	case logrus.TraceLevel:
+		return DebugLevel
+	case logrus.DebugLevel:
+		return InfoLevel
+	case logrus.InfoLevel:
+		return SuccessLevel
+	case logrus.WarnLevel:
+		return WarnLevel
+	case logrus.ErrorLevel:
+		return ErrorLevel
+	case logrus.FatalLevel:
+		return FatalLevel
+	case logrus.PanicLevel:
+		return PanicLevel
+	default:
+		return InfoLevel
+	}
 }

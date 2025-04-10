@@ -4,14 +4,13 @@ import (
 	"github.com/LagrangeDev/LagrangeGo/client"
 	"github.com/LagrangeDev/LagrangeGo/client/event"
 	"github.com/LagrangeDev/LagrangeGo/message"
-	"github.com/machinacanis/cryo/log"
 	"time"
 )
 
 // EventBind 绑定LagrangeGo的事件到cryobot的事件总线
-func EventBind(c *LagrangeClient) {
+func (c *LagrangeClient) eventBind() {
 
-	log.Infof("[Cryo] 正在将 %d 的消息事件绑定到事件总线", c.Client.Uin)
+	c.logger.Infof("[Cryo] 正在将 %d 的消息事件绑定到事件总线", c.Client.Uin)
 	// 断开连接
 	c.Client.DisconnectedEvent.Subscribe(func(client *client.QQClient, event *client.DisconnectedEvent) {
 		c.bus.Publish(&BotDisconnectedEvent{UniEvent{
@@ -499,5 +498,5 @@ func EventBind(c *LagrangeClient) {
 		})
 	})
 
-	log.Infof("[Cryo] %d 的消息事件绑定完成", c.Client.Uin)
+	c.logger.Successf("[Cryo] %d 的消息事件绑定完成", c.Client.Uin)
 }

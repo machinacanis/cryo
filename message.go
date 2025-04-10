@@ -2,7 +2,6 @@ package cryo
 
 import (
 	lgrmessage "github.com/LagrangeDev/LagrangeGo/message"
-	"github.com/machinacanis/cryo/log"
 	"io"
 )
 
@@ -136,11 +135,11 @@ func (m *Message) AddImageStream(r io.ReadSeeker, summary ...string) *Message {
 }
 
 // AddImageFile 添加图片消息元素，使用文件路径
-func (m *Message) AddImageFile(filePath string, summary ...string) *Message {
+func (m *Message) AddImageFile(filePath string, summary ...string) (*Message, error) {
 	imgElement, err := lgrmessage.NewFileImage(filePath, summary...)
 	if err != nil {
-		log.Errorf("打开位于 %s 的图片时失败: %v", filePath, err)
+		return nil, err
 	}
 	*m = append(*m, &Image{*imgElement})
-	return m
+	return m, nil
 }

@@ -2,7 +2,6 @@ package cryo
 
 import (
 	"github.com/go-json-experiment/json"
-	"github.com/sirupsen/logrus"
 	"os"
 )
 
@@ -11,8 +10,6 @@ var DefaultSignServer = "https://sign.lagrangecore.org/api/sign/30366" // 默认
 
 // Config cryo 的配置项，通过在 Bot.Init() 中传入来控制每个Bot实例的功能
 type Config struct {
-	LogLevel                     logrus.Level
-	LogFormat                    *logrus.Formatter
 	SignServers                  []string `json:"sign_servers,omitempty,omitzero"`                    // 签名服务器列表
 	EnablePluginAutoLoad         bool     `json:"enable_plugin_auto_load,omitempty,omitzero"`         // 是否启用插件自动加载（自动启用插件）
 	EnableClientAutoSave         bool     `json:"enable_client_save,omitempty,omitzero"`              // 是否启用客户端信息自动保存

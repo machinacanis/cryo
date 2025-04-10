@@ -24,10 +24,17 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: 'Cryo 速冻指南',
+        text: 'Cryo 速冻教程',
         items: [
           { text: '引言', link: '/guides/intro' },
           { text: '快速开始', link: '/guides/quick-start' },
+        ]
+      },
+      {
+        text: '指南',
+        items: [
+          { text: '配置项', link: '/guides/config' },
+          { text: '日志', link: '/guides/logger' },
         ]
       }
     ],

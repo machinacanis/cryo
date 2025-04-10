@@ -281,3 +281,52 @@ func KeyWordRule(keyword ...string) Rule[Event] {
 			return false
 		})
 }
+
+// AllKeyWordRule 内置的全关键词匹配规则，检查消息是否同时包含所有指定的关键词
+// 会遍历所有文本元素，只有当所有关键词都能在消息中找到时才返回true
+func AllKeyWordRule(keyword ...string) Rule[Event] {
+	return RuleFor(
+		func(e *GroupMessageEvent) bool {
+			// 如果没有指定关键词，直接返回false
+			if len(keyword) == 0 {
+				return false
+			}
+
+			msg := *e.GetMessage()
+			// 快速检查：如果消息为空，直接返回
+			if len(msg) == 0 {
+				return false
+			}
+
+			// 创建一个map来跟踪每个关键词是否已找到
+			foundKeywords := make(map[string]bool, len(keyword))
+			for _, k := range keyword {
+				foundKeywords[k] = false
+			}
+
+			// 遍历所有消息元素，寻找文本元素
+			for _, element := range msg {
+				if element.GetType() == TextType {
+					if text, ok := element.(*Text); ok {
+						content := text.Content
+
+						// 检查每个关键词是否在文本内容中
+						for _, k := range keyword {
+							if len(k) > 0 && !foundKeywords[k] && ContainsKeyword(content, k) {
+								foundKeywords[k] = true
+							}
+						}
+					}
+				}
+			}
+
+			// 检查是否所有关键词都找到了
+			for _, found := range foundKeywords {
+				if !found {
+					return false
+				}
+			}
+
+			return true
+		})
+}

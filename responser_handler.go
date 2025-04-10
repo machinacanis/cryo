@@ -1,9 +1,10 @@
 package cryo
 
 import (
-	"github.com/machinacanis/cryo/log"
 	"reflect"
 )
+
+// TODO：给响应器重新设计一下异常处理流程
 
 // Handle 使用反射来实现事件处理函数的注册，反正这个方法调用频率不高，不太需要担心性能问题
 func (r *OnResponser) Handle(handler interface{}, ordering ...MiddlewareOrdering) *OnResponser {
@@ -16,13 +17,13 @@ func (r *OnResponser) Handle(handler interface{}, ordering ...MiddlewareOrdering
 
 	handlerType := reflect.TypeOf(handler)
 	if handlerType.Kind() != reflect.Func {
-		log.Error("传入的处理函数不是一个函数")
+		// log.Error("传入的处理函数不是一个函数")
 		return r
 	}
 
 	// 检查函数是否符合要求的模式
 	if handlerType.NumIn() != 1 || !handlerType.In(0).Implements(reflect.TypeOf((*Event)(nil)).Elem()) {
-		log.Error("处理函数必须接受一个实现了Event接口的参数")
+		// log.Error("处理函数必须接受一个实现了Event接口的参数")
 		return r
 	}
 
@@ -31,7 +32,7 @@ func (r *OnResponser) Handle(handler interface{}, ordering ...MiddlewareOrdering
 	isConsumer := handlerType.NumOut() == 0
 
 	if !isTransformer && !isConsumer {
-		log.Error("处理函数必须是转换型(func(T) T)或消费型(func(T))")
+		// log.Error("处理函数必须是转换型(func(T) T)或消费型(func(T))")
 		return r
 	}
 
