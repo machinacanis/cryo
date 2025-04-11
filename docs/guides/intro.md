@@ -1,7 +1,7 @@
 # 引言 <Badge type="warning" text="beta" />
 
 ::: tip
-当前的 Cryo 指南适配于 [β v0.1.6](https://github.com/machinacanis/cryo/releases/tag/v0.1.6) 版本
+当前的 Cryo 指南适配于 [β v0.1.7](https://github.com/machinacanis/cryo/releases/tag/v0.1.7) 版本
 :::
 
 ::: warning 

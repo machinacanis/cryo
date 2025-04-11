@@ -3,7 +3,9 @@ package cryo
 import (
 	"errors"
 	"fmt"
+	"github.com/go-co-op/gocron/v2"
 	"github.com/machinacanis/cryo/log"
+	"time"
 )
 
 // Bot cryo 的Bot封装
@@ -12,10 +14,13 @@ import (
 type Bot struct {
 	initFlag         bool                       // 是否初始化完成
 	connectedClients map[string]*LagrangeClient // 已连接的Bot客户端集合
-	logger           log.CryoLogger             // 日志记录器
 	bus              *EventBus                  // 事件总线
 	conf             Config                     // 配置项
 	plugin           []Plugin                   // 插件列表
+	scheduler        gocron.Scheduler           // 定时任务调度器
+
+	Logger log.CryoLogger   // 日志记录器
+	Tasks  []*ScheduledTask // 定时任务列表
 }
 
 // NewBot 创建一个新的CryoBot实例
@@ -29,6 +34,7 @@ func NewBot() *Bot {
 //
 // 如果本地配置文件存在，且没有传入配置项，则会自动加载本地配置文件
 func (b *Bot) Init(logger log.CryoLogger, c ...Config) {
+	// 默认配置项
 	defaultConfig := Config{
 		SignServers:                  []string{DefaultSignServer},
 		EnablePluginAutoLoad:         true,
@@ -37,15 +43,17 @@ func (b *Bot) Init(logger log.CryoLogger, c ...Config) {
 		EnableConnectPrintMiddleware: true,
 		EnableMessagePrintMiddleware: true,
 		EnableEventDebugMiddleware:   false,
+		EnableCronScheduler:          false,
 	}
-	b.logger = logger
+	b.Logger = logger
 	if len(c) == 0 { // 如果没有传入配置项，则尝试加载本地配置文件
 		co, err := ReadCryoConfig()
 		if err == nil {
 			c = append(c, co)
-			b.logger.Info("已正在加载本地配置文件")
+			b.Logger.Info("已正在加载本地配置文件")
 		}
 	}
+	// 用传入的配置项覆写默认配置
 	if len(c) > 0 {
 		if c[0].SignServers != nil {
 			defaultConfig.SignServers = c[0].SignServers
@@ -68,12 +76,18 @@ func (b *Bot) Init(logger log.CryoLogger, c ...Config) {
 		if c[0].EnableEventDebugMiddleware {
 			defaultConfig.EnableEventDebugMiddleware = c[0].EnableEventDebugMiddleware
 		}
+		if c[0].EnableCronScheduler {
+			defaultConfig.EnableCronScheduler = c[0].EnableCronScheduler
+		}
 	}
 	b.conf = defaultConfig // 初始化配置
 
+	s, _ := gocron.NewScheduler() // 初始化定时任务调度器
+	b.scheduler = s
+
 	// 初始化事件总线
 	fmt.Print(log.Logo)
-	b.logger.Infof("[Cryo] 🧊cryobot 正在初始化...")
+	b.Logger.Infof("[Cryo] 🧊cryobot 正在初始化...")
 	b.bus = NewEventBus() // 初始化事件总线
 	// 初始化连接的客户端集合
 	b.connectedClients = make(map[string]*LagrangeClient)
@@ -82,7 +96,7 @@ func (b *Bot) Init(logger log.CryoLogger, c ...Config) {
 	// 设置消息打印中间件
 	// setMessagePrintMiddleware()
 	// 设置事件调试中间件
-	setDefaultMiddleware(b.bus, b.logger, b.conf)
+	setDefaultMiddleware(b.bus, b.Logger, b.conf)
 
 	b.initFlag = true
 }
@@ -96,9 +110,15 @@ func (b *Bot) IsInit() bool {
 func (b *Bot) Start() error {
 	if !b.initFlag {
 		// 没有进行初始化
-		b.logger.Error("cryobot 没有进行初始化，请先调用 Init() 函数进行初始化！")
+		b.Logger.Error("cryobot 没有进行初始化，请先调用 Init() 函数进行初始化！")
 		return errors.New("cryobot 没有进行初始化，请先调用 Init() 函数进行初始化！")
 	}
+
+	if b.conf.EnableCronScheduler {
+		b.Logger.Success("[Cryo] 定时任务调度器已启用")
+		b.scheduler.Start() // 启动定时任务调度器
+	}
+
 	select {} // 阻塞主线程，运行事件循环
 }
 
@@ -108,7 +128,7 @@ func (b *Bot) Start() error {
 func (b *Bot) AutoConnect() error {
 	if !b.initFlag {
 		// 没有进行初始化
-		b.logger.Error("cryobot 没有进行初始化，请先调用 Init() 函数进行初始化！")
+		b.Logger.Error("cryobot 没有进行初始化，请先调用 Init() 函数进行初始化！")
 		return errors.New("cryobot 没有进行初始化，请先调用 Init() 函数进行初始化！")
 	}
 	// 首先检测是否已经连接
@@ -125,7 +145,7 @@ func (b *Bot) AutoConnect() error {
 		retriedCount++
 	}
 	if len(b.connectedClients) == 0 {
-		b.logger.Error("达到最大重试次数，cryobot 无法连接到bot客户端，请检查网络或配置文件")
+		b.Logger.Error("达到最大重试次数，cryobot 无法连接到bot客户端，请检查网络或配置文件")
 		return errors.New("达到最大重试次数，cryobot 无法连接到bot客户端，请检查网络或配置文件")
 	}
 	return nil
@@ -134,11 +154,11 @@ func (b *Bot) AutoConnect() error {
 // ConnectSavedClient 尝试查询并连接到指定的bot客户端
 func (b *Bot) ConnectSavedClient(info ClientInfo) bool {
 	c := NewLagrangeClient()
-	c.Init(b.bus, b.logger, b.conf)
+	c.Init(b.bus, b.Logger, b.conf)
 	if !c.Rebuild(info) {
 		return false
 	}
-	b.logger.Infof("[Cryo] 正在连接 %s：%s (%d)", c.Nickname, c.Id, c.Uin)
+	b.Logger.Infof("[Cryo] 正在连接 %s：%s (%d)", c.Nickname, c.Id, c.Uin)
 	if !c.SignatureLogin() {
 		return false
 	}
@@ -149,8 +169,8 @@ func (b *Bot) ConnectSavedClient(info ClientInfo) bool {
 // ConnectNewClient 尝试连接一个新的bot客户端
 func (b *Bot) ConnectNewClient() bool {
 	c := NewLagrangeClient()
-	c.Init(b.bus, b.logger, b.conf)
-	b.logger.Infof("[Cryo] 正在连接 %s：%s (%d)", c.Nickname, c.Id, c.Uin)
+	c.Init(b.bus, b.Logger, b.conf)
+	b.Logger.Infof("[Cryo] 正在连接 %s：%s (%d)", c.Nickname, c.Id, c.Uin)
 	if !c.QRCodeLogin() {
 		return false
 	}
@@ -163,17 +183,17 @@ func (b *Bot) ConnectAllSavedClient() {
 	// 读取历史连接的客户端
 	clientInfos, err := ReadClientInfos()
 	if err != nil {
-		b.logger.Error("读取Bot信息时出现错误：", err)
+		b.Logger.Error("读取Bot信息时出现错误：", err)
 		return
 	}
 	if len(clientInfos) == 0 {
-		b.logger.Info("没有找到Bot信息")
+		b.Logger.Info("没有找到Bot信息")
 		return
 	}
 	for _, info := range clientInfos {
 		if !b.ConnectSavedClient(info) {
-			b.logger.Error("通过历史记录连接Bot客户端失败")
-			b.logger.Error("已自动清除失效的客户端信息，请重新登录")
+			b.Logger.Error("通过历史记录连接Bot客户端失败")
+			b.Logger.Error("已自动清除失效的客户端信息，请重新登录")
 		}
 	}
 }
@@ -208,7 +228,7 @@ func (b *Bot) GetClientByUid(uid string) *LagrangeClient {
 
 // GetClient 获取指定事件对应的bot客户端
 func (b *Bot) GetClient(event Event) *LagrangeClient {
-	return b.GetClientById(event.GetUniEvent().BotId)
+	return b.GetClientById(event.GetUniEvent().ClientId)
 }
 
 // GetBus 获取事件总线
@@ -221,10 +241,10 @@ func (b *Bot) AddPlugin(plugin ...Plugin) {
 	for _, p := range plugin {
 		err := p.Init(b)
 		if err != nil {
-			b.logger.Errorf("[Cryo] 插件 %s 初始化失败：%v", p.GetPluginName(), err)
+			b.Logger.Errorf("[Cryo] 插件 %s 初始化失败：%v", p.GetPluginName(), err)
 		}
 		if b.conf.EnablePluginAutoLoad { // 如果启用自动加载插件
-			b.logger.Successf("[Cryo] 插件 %s 已成功加载", p.GetPluginName())
+			b.Logger.Successf("[Cryo] 插件 %s 已成功加载", p.GetPluginName())
 			p.Enable()
 		}
 		b.plugin = append(b.plugin, p)
@@ -275,7 +295,7 @@ func (b *Bot) RemovePlugin(plugin ...Plugin) {
 		for i, pl := range b.plugin {
 			if pl.GetPluginName() == p.GetPluginName() {
 				b.plugin = append(b.plugin[:i], b.plugin[i+1:]...)
-				b.logger.Infof("[Cryo] 插件 %s 已卸载", p.GetPluginName())
+				b.Logger.Infof("[Cryo] 插件 %s 已卸载", p.GetPluginName())
 				break
 			}
 		}
@@ -284,12 +304,66 @@ func (b *Bot) RemovePlugin(plugin ...Plugin) {
 
 // GetLogger 获取日志记录器
 func (b *Bot) GetLogger() log.CryoLogger {
-	return b.logger
+	return b.Logger
 }
 
 // GetConfig 获取配置项
 func (b *Bot) GetConfig() Config {
 	return b.conf
+}
+
+// AddDelayTask 添加延迟任务
+func (b *Bot) AddDelayTask(name string, duration time.Duration, task func() error) *ScheduledTask {
+	st := NewDelayTask(name, duration, task)
+	st.Set(b) // 设置任务
+	// 将任务添加到定时任务列表
+	b.Tasks = append(b.Tasks, st)
+	return st
+}
+
+// AddIntervalTask 添加间隔任务
+func (b *Bot) AddIntervalTask(name string, duration time.Duration, isInstantly bool, task func() error) *ScheduledTask {
+	st := NewIntervalTask(name, duration, isInstantly, task)
+	st.Set(b) // 设置任务
+	// 将任务添加到定时任务列表
+	b.Tasks = append(b.Tasks, st)
+	return st
+}
+
+// AddCronTask 添加定时任务
+func (b *Bot) AddCronTask(name string, cron string, isWithSeconds bool, task func() error) *ScheduledTask {
+	st := NewCronTask(name, cron, isWithSeconds, task)
+	st.Set(b) // 设置任务
+	// 将任务添加到定时任务列表
+	b.Tasks = append(b.Tasks, st)
+	return st
+}
+
+// GetTaskByName 根据名称获取定时任务
+func (b *Bot) GetTaskByName(name string) []*ScheduledTask {
+	var tasks []*ScheduledTask
+	for _, task := range b.Tasks {
+		if task.name == name {
+			tasks = append(tasks, task)
+		}
+	}
+	return tasks
+}
+
+// GetTaskById 根据ID获取定时任务
+func (b *Bot) GetTaskById(id string) []*ScheduledTask {
+	var tasks []*ScheduledTask
+	for _, task := range b.Tasks {
+		if task.id == id {
+			tasks = append(tasks, task)
+		}
+	}
+	return tasks
+}
+
+// StopTask 停止定时任务
+func (b *Bot) StopTask(st *ScheduledTask) error {
+	return st.Stop(b)
 }
 
 // Send 快速根据事件内容发送消息
@@ -302,4 +376,10 @@ func (b *Bot) Send(event MessageEvent, args ...interface{}) (ok bool, messageId 
 func (b *Bot) Reply(event MessageEvent, args ...interface{}) (ok bool, messageId uint32) {
 	// 根据事件获取对应的bot客户端
 	return b.GetClient(event).Reply(event, args...)
+}
+
+// Poke 快速根据事件内容发送戳一戳
+func (b *Bot) Poke(event MessageEvent) (ok bool) {
+	// 根据事件获取对应的bot客户端
+	return b.GetClient(event).Poke(event)
 }

@@ -23,12 +23,12 @@ type UniEvent struct {
 	Time      uint32    `json:"time,omitzero,omitempty"`       // 事件发生的时间戳
 
 	// 接收到事件的Bot客户端的基本信息
-	botClient   *LagrangeClient // 指向接收到事件的Bot客户端
-	BotId       string          `json:"bot_id,omitzero,omitempty"`       // 机器人ID
-	BotNickname string          `json:"bot_nickname,omitzero,omitempty"` // 机器人昵称
-	BotUin      uint32          `json:"bot_uin,omitzero,omitempty"`      // 机器人Uin
-	BotUid      string          `json:"bot_uid,omitzero,omitempty"`      // 机器人Uid
-	Platform    string          `json:"platform,omitzero,omitempty"`     // 机器人平台
+	botClient      *LagrangeClient // 指向接收到事件的Bot客户端
+	ClientId       string          `json:"bot_id,omitzero,omitempty"`       // 机器人客户端ID
+	ClientNickname string          `json:"bot_nickname,omitzero,omitempty"` // 机器人客户端昵称
+	ClientUin      uint32          `json:"bot_uin,omitzero,omitempty"`      // 机器人客户端Uin
+	ClientUid      string          `json:"bot_uid,omitzero,omitempty"`      // 机器人客户端Uid
+	Platform       string          `json:"platform,omitzero,omitempty"`     // 机器人客户端平台
 }
 
 // GetUniEvent 获取事件的基础信息
@@ -60,16 +60,17 @@ func (e *UniEvent) GetClient() *LagrangeClient {
 func (e *UniEvent) Clone() Event {
 	// 克隆事件
 	return &UniEvent{
-		EventType:   e.EventType,
-		EventId:     e.EventId,
-		EventTags:   e.EventTags,
-		Time:        e.Time,
-		botClient:   e.botClient,
-		BotId:       e.BotId,
-		BotNickname: e.BotNickname,
-		BotUin:      e.BotUin,
-		BotUid:      e.BotUid,
-		Platform:    e.Platform,
+		payload:        e.payload,
+		EventType:      e.EventType,
+		EventId:        e.EventId,
+		EventTags:      e.EventTags,
+		Time:           e.Time,
+		botClient:      e.botClient,
+		ClientId:       e.ClientId,
+		ClientNickname: e.ClientNickname,
+		ClientUin:      e.ClientUin,
+		ClientUid:      e.ClientUid,
+		Platform:       e.Platform,
 	}
 }
 
@@ -130,16 +131,17 @@ func (e *UniMessageEvent) Clone() Event {
 	// 克隆事件
 	return &UniMessageEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		MessageId:       e.MessageId,
 		SenderUin:       e.SenderUin,
@@ -348,6 +350,30 @@ type (
 		summury string      // 摘要
 		payload interface{} // 负载
 	}
+
+	// ScheduledTaskRegisteredEvent 定时任务注册事件
+	ScheduledTaskRegisteredEvent struct {
+		UniEvent
+		task *ScheduledTask // 定时任务对象
+	}
+
+	// ScheduledTaskSuccessEvent 定时任务成功事件
+	ScheduledTaskSuccessEvent struct {
+		UniEvent
+		task *ScheduledTask // 定时任务对象
+	}
+
+	// ScheduledTaskFailedEvent 定时任务失败事件
+	ScheduledTaskFailedEvent struct {
+		UniEvent
+		task *ScheduledTask // 定时任务对象
+	}
+
+	// ScheduledTaskStoppedEvent 定时任务停止事件
+	ScheduledTaskStoppedEvent struct {
+		UniEvent
+		task *ScheduledTask // 定时任务对象
+	}
 )
 
 func (e *PrivateMessageEvent) Clone() Event {
@@ -355,16 +381,17 @@ func (e *PrivateMessageEvent) Clone() Event {
 	return &PrivateMessageEvent{
 		UniMessageEvent: UniMessageEvent{
 			UniEvent: UniEvent{
-				EventType:   e.EventType,
-				EventId:     e.EventId,
-				EventTags:   e.EventTags,
-				Time:        e.Time,
-				botClient:   e.botClient,
-				BotId:       e.BotId,
-				BotNickname: e.BotNickname,
-				BotUin:      e.BotUin,
-				BotUid:      e.BotUid,
-				Platform:    e.Platform,
+				payload:        e.payload,
+				EventType:      e.EventType,
+				EventId:        e.EventId,
+				EventTags:      e.EventTags,
+				Time:           e.Time,
+				botClient:      e.botClient,
+				ClientId:       e.ClientId,
+				ClientNickname: e.ClientNickname,
+				ClientUin:      e.ClientUin,
+				ClientUid:      e.ClientUid,
+				Platform:       e.Platform,
 			},
 			MessageId:       e.MessageId,
 			SenderUin:       e.SenderUin,
@@ -387,16 +414,17 @@ func (e *GroupMessageEvent) Clone() Event {
 	return &GroupMessageEvent{
 		UniMessageEvent: UniMessageEvent{
 			UniEvent: UniEvent{
-				EventType:   e.EventType,
-				EventId:     e.EventId,
-				EventTags:   e.EventTags,
-				Time:        e.Time,
-				botClient:   e.botClient,
-				BotId:       e.BotId,
-				BotNickname: e.BotNickname,
-				BotUin:      e.BotUin,
-				BotUid:      e.BotUid,
-				Platform:    e.Platform,
+				payload:        e.payload,
+				EventType:      e.EventType,
+				EventId:        e.EventId,
+				EventTags:      e.EventTags,
+				Time:           e.Time,
+				botClient:      e.botClient,
+				ClientId:       e.ClientId,
+				ClientNickname: e.ClientNickname,
+				ClientUin:      e.ClientUin,
+				ClientUid:      e.ClientUid,
+				Platform:       e.Platform,
 			},
 			MessageId:       e.MessageId,
 			SenderUin:       e.SenderUin,
@@ -417,16 +445,17 @@ func (e *TempMessageEvent) Clone() Event {
 	return &TempMessageEvent{
 		UniMessageEvent: UniMessageEvent{
 			UniEvent: UniEvent{
-				EventType:   e.EventType,
-				EventId:     e.EventId,
-				EventTags:   e.EventTags,
-				Time:        e.Time,
-				botClient:   e.botClient,
-				BotId:       e.BotId,
-				BotNickname: e.BotNickname,
-				BotUin:      e.BotUin,
-				BotUid:      e.BotUid,
-				Platform:    e.Platform,
+				payload:        e.payload,
+				EventType:      e.EventType,
+				EventId:        e.EventId,
+				EventTags:      e.EventTags,
+				Time:           e.Time,
+				botClient:      e.botClient,
+				ClientId:       e.ClientId,
+				ClientNickname: e.ClientNickname,
+				ClientUin:      e.ClientUin,
+				ClientUid:      e.ClientUid,
+				Platform:       e.Platform,
 			},
 			MessageId:       e.MessageId,
 			SenderUin:       e.SenderUin,
@@ -445,16 +474,17 @@ func (e *NewFriendRequestEvent) Clone() Event {
 	// 克隆事件
 	return &NewFriendRequestEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		Uin:      e.Uin,
 		Uid:      e.Uid,
@@ -467,16 +497,17 @@ func (e *NewFriendEvent) Clone() Event {
 	// 克隆事件
 	return &NewFriendEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		Uin:      e.Uin,
 		Uid:      e.Uid,
@@ -489,16 +520,17 @@ func (e *FriendRecallEvent) Clone() Event {
 	// 克隆事件
 	return &FriendRecallEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		Uin:     e.Uin,
 		Uid:     e.Uid,
@@ -511,16 +543,17 @@ func (e *FriendRenameEvent) Clone() Event {
 	// 克隆事件
 	return &FriendRenameEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		IsSelf:   e.IsSelf,
 		Uin:      e.Uin,
@@ -533,16 +566,17 @@ func (e *FriendPokeEvent) Clone() Event {
 	// 克隆事件
 	return &FriendPokeEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		SenderUin: e.SenderUin,
 		TargetUin: e.TargetUin,
@@ -555,16 +589,17 @@ func (e *GroupMemberPermissionUpdatedEvent) Clone() Event {
 	// 克隆事件
 	return &GroupMemberPermissionUpdatedEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		GroupUin: e.GroupUin,
 		Uin:      e.Uin,
@@ -576,16 +611,17 @@ func (e *GroupNameUpdatedEvent) Clone() Event {
 	// 克隆事件
 	return &GroupNameUpdatedEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		GroupUin: e.GroupUin,
 		NewName:  e.NewName,
@@ -595,16 +631,17 @@ func (e *GroupMuteEvent) Clone() Event {
 	// 克隆事件
 	return &GroupMuteEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		GroupUin:    e.GroupUin,
 		OperatorUin: e.OperatorUin,
@@ -619,16 +656,17 @@ func (e *GroupRecallEvent) Clone() Event {
 	// 克隆事件
 	return &GroupRecallEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		GroupUin:    e.GroupUin,
 		OperatorUin: e.OperatorUin,
@@ -643,16 +681,17 @@ func (e *GroupMemberJoinRequestEvent) Clone() Event {
 	// 克隆事件
 	return &GroupMemberJoinRequestEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		GroupUin:       e.GroupUin,
 		SenderUin:      e.SenderUin,
@@ -667,16 +706,17 @@ func (e *GroupMemberIncreaseEvent) Clone() Event {
 	// 克隆事件
 	return &GroupMemberIncreaseEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		GroupUin:   e.GroupUin,
 		Uin:        e.Uin,
@@ -690,16 +730,17 @@ func (e *GroupMemberDecreaseEvent) Clone() Event {
 	// 克隆事件
 	return &GroupMemberDecreaseEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		GroupUin: e.GroupUin,
 		Uin:      e.Uin,
@@ -711,16 +752,17 @@ func (e *GroupDigestEvent) Clone() Event {
 	// 克隆事件
 	return &GroupDigestEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		GroupUin:         e.GroupUin,
 		MessageId:        e.MessageId,
@@ -737,16 +779,17 @@ func (e *GroupReactionEvent) Clone() Event {
 	// 克隆事件
 	return &GroupReactionEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		GroupUin:  e.GroupUin,
 		Uin:       e.Uin,
@@ -763,16 +806,17 @@ func (e *GroupMemberSpecialTitleUpdated) Clone() Event {
 	// 克隆事件
 	return &GroupMemberSpecialTitleUpdated{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		GroupUin: e.GroupUin,
 		Uin:      e.Uin,
@@ -785,16 +829,17 @@ func (e *GroupInviteEvent) Clone() Event {
 	// 克隆事件
 	return &GroupInviteEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		GroupUin:        e.GroupUin,
 		GroupName:       e.GroupName,
@@ -809,16 +854,17 @@ func (e *BotConnectedEvent) Clone() Event {
 	// 克隆事件
 	return &BotConnectedEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		Version: e.Version,
 	}
@@ -828,16 +874,17 @@ func (e *BotDisconnectedEvent) Clone() Event {
 	// 克隆事件
 	return &BotDisconnectedEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 	}
 }
@@ -846,18 +893,99 @@ func (e *CustomEvent) Clone() Event {
 	// 克隆事件
 	return &CustomEvent{
 		UniEvent: UniEvent{
-			EventType:   e.EventType,
-			EventId:     e.EventId,
-			EventTags:   e.EventTags,
-			Time:        e.Time,
-			botClient:   e.botClient,
-			BotId:       e.BotId,
-			BotNickname: e.BotNickname,
-			BotUin:      e.BotUin,
-			BotUid:      e.BotUid,
-			Platform:    e.Platform,
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
 		},
 		summury: e.summury,
 		payload: e.payload,
+	}
+}
+
+func (e *ScheduledTaskRegisteredEvent) Clone() Event {
+	// 克隆事件
+	return &ScheduledTaskRegisteredEvent{
+		UniEvent: UniEvent{
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
+		},
+		task: e.task,
+	}
+}
+
+func (e *ScheduledTaskSuccessEvent) Clone() Event {
+	// 克隆事件
+	return &ScheduledTaskSuccessEvent{
+		UniEvent: UniEvent{
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
+		},
+		task: e.task,
+	}
+}
+
+func (e *ScheduledTaskFailedEvent) Clone() Event {
+	// 克隆事件
+	return &ScheduledTaskFailedEvent{
+		UniEvent: UniEvent{
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
+		},
+		task: e.task,
+	}
+}
+
+func (e *ScheduledTaskStoppedEvent) Clone() Event {
+	// 克隆事件
+	return &ScheduledTaskStoppedEvent{
+		UniEvent: UniEvent{
+			payload:        e.payload,
+			EventType:      e.EventType,
+			EventId:        e.EventId,
+			EventTags:      e.EventTags,
+			Time:           e.Time,
+			botClient:      e.botClient,
+			ClientId:       e.ClientId,
+			ClientNickname: e.ClientNickname,
+			ClientUin:      e.ClientUin,
+			ClientUid:      e.ClientUid,
+			Platform:       e.Platform,
+		},
+		task: e.task,
 	}
 }

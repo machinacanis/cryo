@@ -4,6 +4,8 @@ package cryo
 type EventType uint32
 
 const (
+	// 这一部分是Bot客户端相关的事件类型
+
 	UniEventType                            EventType = iota // 基础事件类型
 	UniMessageEventType                                      // 消息事件类型
 	PrivateMessageEventType                                  // 私聊消息事件类型
@@ -25,9 +27,16 @@ const (
 	GroupReactionEventType                                   // 群消息表情事件类型
 	GroupMemberSpecialTitleUpdatedEventType                  // 群成员特殊头衔变更事件类型
 	GroupInviteEventType                                     // 加群邀请事件类型
-	BotConnectedEventType                                    // 机器人连接事件类型
-	BotDisconnectedEventType                                 // 机器人断开连接事件类型
-	CustomEventType                                          // 自定义事件类型
+
+	// 这一部分是框架相关的事件类型
+
+	CustomEventType                  // 自定义事件类型
+	BotConnectedEventType            // 机器人连接事件类型
+	BotDisconnectedEventType         // 机器人断开连接事件类型
+	ScheduledTaskRegisteredEventType // 定时任务被注册事件类型
+	ScheduledTaskSuccessEventType    // 定时任务执行成功事件类型
+	ScheduledTaskFailedEventType     // 定时任务执行失败事件类型
+	ScheduledTaskStoppedEventType    // 定时任务被停止事件类型
 )
 
 // ToString 输出事件类型的字符串表示
@@ -81,6 +90,14 @@ func (et EventType) ToString() string {
 		return "BotDisconnectedEvent"
 	case CustomEventType:
 		return "CustomEventType"
+	case ScheduledTaskRegisteredEventType:
+		return "ScheduledTaskRegisteredEvent"
+	case ScheduledTaskSuccessEventType:
+		return "ScheduledTaskSuccessEvent"
+	case ScheduledTaskFailedEventType:
+		return "ScheduledTaskFailedEvent"
+	case ScheduledTaskStoppedEventType:
+		return "ScheduledTaskStoppedEvent"
 	default:
 		return "UnknownEventType"
 	}
@@ -113,5 +130,9 @@ func AllEventTypes() []EventType {
 		BotConnectedEventType,
 		BotDisconnectedEventType,
 		CustomEventType,
+		ScheduledTaskRegisteredEventType,
+		ScheduledTaskSuccessEventType,
+		ScheduledTaskFailedEventType,
+		ScheduledTaskStoppedEventType,
 	}
 }

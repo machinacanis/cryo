@@ -11,11 +11,12 @@ cryo 是一个轻量级聊天机器人开发框架，通过嵌入协议实现  [
 
 ## 特性
 
-- 内嵌协议实现
-- 不出意外的话可以单文件部署
-- 为多Bot连接设计
-- 消息去重 / 负载均衡
-- 可启用的Web后台
+- 使用 LagrangeGo 作为协议实现
+- 事件驱动
+- 自动并发处理
+- 单文件部署
+- 多Bot连接友好
+
 
 ## 安装
 
@@ -25,7 +26,7 @@ go get -u github.com/machinacanis/cryo
 
 ## 快速开始
 
-[`script/example.go`](https://github.com/machinacanis/cryo/blob/main/script/example.go)是一个最小化的聊天机器人示例，展示了如何使用 cryo 框架登录账号并处理消息。
+查看 [文档](https://machinacanis.github.io/cryo/) 以查看完整的框架功能介绍及一个更全面的示例。
 
 ```go
 // 尚处于开发阶段，API 可能会有变动
@@ -44,11 +45,13 @@ func main() {
 		EnableMessagePrintMiddleware: true,
 		EnableEventDebugMiddleware:   true,
 	})
+	
+	bot.AddPlugin(cryo_plugin_echo.Instance) // 添加插件
 
-	bot.OnType(cryo.PrivateMessageEventType, cryo.GroupMessageEventType).
+	bot.OnMessage().
 		Handle(func(e *cryo.PrivateMessageEvent) {
 			logger.Info("响应事件 " + e.EventId)
-			// 自定义逻辑
+			// ... 自定义逻辑
 		}, cryo.AsyncMiddlewareType).
 		Register()
 
@@ -57,8 +60,6 @@ func main() {
 }
 
 ```
-
-查看 [文档](https://machinacanis.github.io/cryo/) 以查看完整的框架功能介绍及一个更全面的示例。
 
 > [cryo-plugin-echo](https://github.com/machinacanis/cryo-plugin-echo) 是一个简单的 cryo 插件示例，展示了如何使用插件系统来更方便的组织代码。
 
@@ -74,5 +75,6 @@ cryo 基于这些开源项目：
 - [freecache](https://github.com/coocood/freecache) | 高性能的内存缓存库
 - [uuid](https://github.com/google/uuid) | UUID 生成器
 - [go-qrcode](https://github.com/skip2/go-qrcode) | 二维码生成 / 解析工具
+- [gocron](https://github.com/go-co-op/gocron) | 定时任务调度器
 
 向这些项目的贡献者们致以最诚挚的感谢！

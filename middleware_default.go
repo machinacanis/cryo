@@ -18,13 +18,13 @@ func setDefaultMiddleware(bus *EventBus, logger log.CryoLogger, conf Config) {
 		mw2 := NewUniMiddleware(BotDisconnectedEventType)
 		mw1.AddHandler(func(e Event) Event {
 			if typedEvent, ok := e.(*BotConnectedEvent); ok {
-				logger.Infof("[Cryo] %s：%s (%d) 已成功连接", typedEvent.BotNickname, typedEvent.BotId, typedEvent.BotUin)
+				logger.Infof("[Cryo] %s：%s (%d) 已成功连接", typedEvent.ClientNickname, typedEvent.ClientId, typedEvent.ClientUin)
 			}
 			return e
 		})
 		mw2.AddHandler(func(e Event) Event {
 			if typedEvent, ok := e.(*BotDisconnectedEvent); ok {
-				logger.Infof("[Cryo] %s：%s (%d) 已断开连接", typedEvent.BotNickname, typedEvent.BotId, typedEvent.BotUin)
+				logger.Infof("[Cryo] %s：%s (%d) 已断开连接", typedEvent.ClientNickname, typedEvent.ClientId, typedEvent.ClientUin)
 			}
 			return e
 		})
@@ -39,19 +39,19 @@ func setDefaultMiddleware(bus *EventBus, logger log.CryoLogger, conf Config) {
 		mw3 := NewUniMiddleware(TempMessageEventType)
 		mw1.AddHandler(func(e Event) Event {
 			if typedEvent, ok := e.(*PrivateMessageEvent); ok {
-				logger.Infof("[%s] [私聊] From %s(%d) - %s", typedEvent.BotNickname, typedEvent.SenderNickname, typedEvent.SenderUin, typedEvent.MessageElements.ToString())
+				logger.Infof("[%s] [私聊] From %s(%d) - %s", typedEvent.ClientNickname, typedEvent.SenderNickname, typedEvent.SenderUin, typedEvent.MessageElements.ToString())
 			}
 			return e
 		})
 		mw2.AddHandler(func(e Event) Event {
 			if typedEvent, ok := e.(*GroupMessageEvent); ok {
-				logger.Infof("[%s] [群聊] [%s(%d)] From %s(%d) - %s", typedEvent.BotNickname, typedEvent.GroupName, typedEvent.GroupUin, typedEvent.SenderNickname, typedEvent.SenderUin, typedEvent.MessageElements.ToString())
+				logger.Infof("[%s] [群聊] [%s(%d)] From %s(%d) - %s", typedEvent.ClientNickname, typedEvent.GroupName, typedEvent.GroupUin, typedEvent.SenderNickname, typedEvent.SenderUin, typedEvent.MessageElements.ToString())
 			}
 			return e
 		})
 		mw3.AddHandler(func(e Event) Event {
 			if typedEvent, ok := e.(*TempMessageEvent); ok {
-				logger.Infof("[%s] [临时] From %s(%d) - %s", typedEvent.BotNickname, typedEvent.SenderNickname, typedEvent.SenderUin, typedEvent.MessageElements.ToString())
+				logger.Infof("[%s] [临时] From %s(%d) - %s", typedEvent.ClientNickname, typedEvent.SenderNickname, typedEvent.SenderUin, typedEvent.MessageElements.ToString())
 			}
 			return e
 		})
@@ -65,7 +65,7 @@ func setDefaultMiddleware(bus *EventBus, logger log.CryoLogger, conf Config) {
 		mw := NewUniMiddleware()
 		mw.AddHandler(func(e Event) Event {
 			u := e.GetUniEvent()
-			logger.Debugf("[EventPublish] %s from %s(%d) with Id %s and Tags %v", u.GetEventType().ToString(), u.BotNickname, u.BotUin, u.EventId, u.EventTags)
+			logger.Debugf("[EventPublish] %s from %s(%d) with Id %s and Tags %v", u.GetEventType().ToString(), u.ClientNickname, u.ClientUin, u.EventId, u.EventTags)
 			return e
 		})
 		bus.AddPreMiddleware(mw)

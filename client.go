@@ -49,7 +49,7 @@ func (c *LagrangeClient) Init(bus *EventBus, logger log.CryoLogger, conf Config)
 
 	appInfo := auth.AppList[c.Platform][c.Version]
 	c.Client = client.NewClient(0, "")
-	c.Client.SetLogger(log.NewProtocolLogger(c.logger)) // 替换日志记录器，详见client/protocol_logger.go以及log/logger.go
+	c.Client.SetLogger(log.NewProtocolLogger(c.logger)) // 替换日志记录器，详见client/protocol_logger.go以及log/Logger.go
 	c.Client.UseVersion(appInfo)
 	c.Client.AddSignServer(conf.SignServers...)
 	c.DeviceNum = randomDeviceNumber()
@@ -128,7 +128,7 @@ func (c *LagrangeClient) AfterLogin() {
 	// 登录成功后，保存签名
 	c.Uin = c.Client.Sig().Uin
 	c.Uid = c.Client.Sig().UID
-	c.sendBotConnectedEvent()        // 发送登录成功事件
+	SendBotConnectedEvent(c)         // 发送登录成功事件
 	if c.conf.EnableClientAutoSave { // 如果启用了自动保存
 		err := c.Save()
 		if err != nil {
@@ -225,26 +225,6 @@ func (c *LagrangeClient) watingForLoginResult() bool {
 	return true
 }
 
-func (c *LagrangeClient) sendBotConnectedEvent() {
-	// 发送bot连接事件
-	c.bus.Publish(&BotConnectedEvent{
-		UniEvent: UniEvent{
-			payload:     nil,
-			EventType:   BotConnectedEventType,
-			EventId:     newUUID(),
-			EventTags:   []string{"cryo", "bot_connected"},
-			Time:        uint32(time.Now().Unix()),
-			botClient:   c,
-			BotId:       c.Id,
-			BotNickname: c.Nickname,
-			BotUin:      c.Uin,
-			BotUid:      c.Uid,
-			Platform:    c.Platform,
-		},
-		Version: c.Version,
-	})
-}
-
 // SendPrivateMessage 发送私聊消息
 func (c *LagrangeClient) SendPrivateMessage(userUin uint32, msg *Message) (ok bool, messageId uint32) {
 	// 发送私聊消息
@@ -276,6 +256,28 @@ func (c *LagrangeClient) SendTempMessage(groupUin, userUin uint32, msg *Message)
 		return false, 0
 	}
 	return true, message.ID
+}
+
+// SendFriendPoke 发送好友戳一戳
+func (c *LagrangeClient) SendFriendPoke(userUin uint32) (ok bool) {
+	// 发送好友戳一戳
+	err := c.Client.FriendPoke(userUin)
+	if err != nil {
+		c.logger.Errorf("向用户 %d 发送戳一戳时出现错误：%v", userUin, err)
+		return false
+	}
+	return true
+}
+
+// SendGroupPoke 发送群戳一戳
+func (c *LagrangeClient) SendGroupPoke(groupUin, userUin uint32) (ok bool) {
+	// 发送群戳一戳
+	err := c.Client.GroupPoke(groupUin, userUin)
+	if err != nil {
+		c.logger.Errorf("向群 %d 的用户 %d 发送戳一戳时出现错误：%v", groupUin, userUin, err)
+		return false
+	}
+	return true
 }
 
 // Send 自动根据事件内容发送信息
@@ -312,4 +314,18 @@ func (c *LagrangeClient) Reply(event MessageEvent, args ...interface{}) (ok bool
 	m := Message{}
 	m.AddReply(event).Add(*ProcessMessageContent(args...)...)
 	return c.Send(event, m)
+}
+
+// Poke 自动根据事件内容戳人（笑
+func (c *LagrangeClient) Poke(event MessageEvent) (ok bool) {
+	// 根据传入的事件来发送消息
+	switch event.GetEventType() {
+	case PrivateMessageEventType:
+		return c.SendFriendPoke(event.GetUniMessageEvent().SenderUin)
+	case GroupMessageEventType:
+		return c.SendGroupPoke(event.GetUniMessageEvent().GroupUin, event.GetUniMessageEvent().SenderUin)
+	default:
+		c.logger.Error("发送戳一戳时传入了不支持的消息事件")
+	}
+	return false
 }
